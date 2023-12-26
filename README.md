@@ -1,17 +1,48 @@
-# ${NAME}
-
-[![CI Status](https://img.shields.io/travis/dankinsoid/${NAME}.svg?style=flat)](https://travis-ci.org/dankinsoid/${NAME})
-[![Version](https://img.shields.io/cocoapods/v/${NAME}.svg?style=flat)](https://cocoapods.org/pods/${NAME})
-[![License](https://img.shields.io/cocoapods/l/${NAME}.svg?style=flat)](https://cocoapods.org/pods/${NAME})
-[![Platform](https://img.shields.io/cocoapods/p/${NAME}.svg?style=flat)](https://cocoapods.org/pods/${NAME})
-
+# swift-networking
 
 ## Description
-This repository provides
+This repository provides reach and flexible networking layer for client Swift applications.
 
 ## Example
 
 ```swift
+struct API {
+
+    var client: NetworkClient
+    
+    var pets: Pets {
+        Pets(client: client.path("pets"))
+    }
+    
+    struct Pets {
+    
+        var client: NetworkClient
+    
+        func list() async throws -> JSON {
+            try await client
+                .query(ListQuery(limit: 100))
+                .body(ListBody())
+                .method(.delete)
+                .json()
+        }
+    }
+
+    func pet(id: String) -> Pet {
+        Pet(client: client.path("pet", id))
+    }
+    
+    struct Pet {
+
+        var client: NetworkClient
+  
+        func update(pet: PetModel) async throws -> JSON {
+            try await client
+                .body(UpdateBody(pet: pet))
+                .method(.post)
+                .json()
+        }
+    }
+}
 
 ```
 ## Usage
@@ -29,10 +60,15 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/${NAME}.git", from: "0.0.1")
+    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.0.1")
   ],
   targets: [
-    .target(name: "SomeProject", dependencies: ["${NAME}"])
+    .target(
+      name: "SomeProject",
+      dependencies: [
+        .product(name:  "SwiftNetworking", package: "swift-networking"),
+      ]
+    )
   ]
 )
 ```
@@ -40,18 +76,10 @@ let package = Package(
 $ swift build
 ```
 
-2.  [CocoaPods](https://cocoapods.org)
-
-Add the following line to your Podfile:
-```ruby
-pod '${NAME}'
-```
-and run `pod update` from the podfile directory first.
-
 ## Author
 
 dankinsoid, voidilov@gmail.com
 
 ## License
 
-${NAME} is available under the MIT license. See the LICENSE file for more info.
+swift-networking is available under the MIT license. See the LICENSE file for more info.
