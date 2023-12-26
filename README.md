@@ -8,12 +8,12 @@ This repository provides reach and flexible networking layer for client Swift ap
 ```swift
 struct API {
 
-    var client: NetworkClient
+    let client = NetworkClient(baseURL: URL(string: "https://pets.com")!)
     
     var pets: Pets {
         Pets(client: client.path("pets"))
     }
-    
+  
     struct Pets {
     
         var client: NetworkClient
@@ -30,7 +30,7 @@ struct API {
     func pet(id: String) -> Pet {
         Pet(client: client.path("pet", id))
     }
-    
+  
     struct Pet {
 
         var client: NetworkClient
