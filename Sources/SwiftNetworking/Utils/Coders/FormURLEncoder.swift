@@ -2,7 +2,7 @@ import Foundation
 import SimpleCoders
 import VDCodable
 
-extension ContentEncoder where Self == FormURLEncoder {
+public extension ContentEncoder where Self == FormURLEncoder {
 
 	static var formURL: Self { .formURL() }
 

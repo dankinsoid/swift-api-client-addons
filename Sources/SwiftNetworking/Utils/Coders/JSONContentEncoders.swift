@@ -2,7 +2,7 @@ import Foundation
 import SimpleCoders
 import VDCodable
 
-extension ContentEncoder where Self == JSONEncoder {
+public extension ContentEncoder where Self == JSONEncoder {
 
 	static var json: Self { .json() }
 

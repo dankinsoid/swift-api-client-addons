@@ -1,4 +1,5 @@
 import SwiftNetworking
+import VDCodable
 import XCTest
 
 final class SwiftNetworkingTests: XCTestCase {
