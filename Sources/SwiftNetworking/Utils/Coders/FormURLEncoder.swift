@@ -43,7 +43,7 @@ public struct FormURLEncoder: ContentEncoder {
 		urlEncoder.trimmingSquareBrackets = trimmingSquareBrackets
 	}
 
-	public static var contentType: ContentType {
+	public var contentType: ContentType {
 		.application(.urlEncoded)
 	}
 

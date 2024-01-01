@@ -25,14 +25,14 @@ public extension ContentEncoder where Self == JSONEncoder {
 
 extension JSONEncoder: ContentEncoder {
 
-	public static var contentType: ContentType {
+	public var contentType: ContentType {
 		.application(.json)
 	}
 }
 
 extension VDJSONEncoder: ContentEncoder {
 
-	public static var contentType: ContentType {
+	public var contentType: ContentType {
 		.application(.json)
 	}
 }

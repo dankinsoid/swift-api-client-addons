@@ -7,8 +7,7 @@ import FoundationNetworking
 public extension NetworkClient {
 
 	func bodyEncoder(_ encoder: some ContentEncoder) -> NetworkClient {
-		contentType(type(of: encoder).contentType)
-			.configs(\.bodyEncoder, encoder)
+		configs(\.bodyEncoder, encoder)
 	}
 
 	func bodyDecoder(_ decoder: some DataDecoder) -> NetworkClient {

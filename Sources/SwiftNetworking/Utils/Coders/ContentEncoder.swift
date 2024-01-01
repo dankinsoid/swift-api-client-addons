@@ -5,5 +5,5 @@ import VDCodable
 
 public protocol ContentEncoder: CodableEncoder where Output == Data {
 
-	static var contentType: ContentType { get }
+    var contentType: ContentType { get }
 }

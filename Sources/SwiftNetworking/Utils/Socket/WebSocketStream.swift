@@ -30,6 +30,18 @@ final actor WebSocketStream: AsyncSequence {
 		.makeAsyncIterator()
 	}
 
+    func send(_ string: String) async throws {
+        try await send {
+            $0.write(string: string, completion: $1)
+        }
+    }
+
+    func send(_ data: Data) async throws {
+        try await send {
+            $0.write(data: data, completion: $1)
+        }
+    }
+
 	private func receive(continuation: AsyncThrowingStream<Data, Error>.Continuation) {
 		guard !isFinished else {
 			continuation.finish()
@@ -67,7 +79,7 @@ final actor WebSocketStream: AsyncSequence {
 		isConnected = false
 	}
 
-	private func onSend(data: Data) {
+	private func onReceive(data: Data) {
 		continuations = continuations.filter {
 			switch $0.value.yield(data) {
 			case let .enqueued(remaining):
@@ -93,6 +105,22 @@ final actor WebSocketStream: AsyncSequence {
 			finish()
 		}
 	}
+    
+    private func send(write: (WebSocket, _ completion: (() -> Void)?) throws -> Void) async throws {
+        let _: Void = try await withCheckedThrowingContinuation { [self] cont in
+            guard isConnected else {
+                cont.resume(throwing: Errors.notConnected)
+                return
+            }
+            do {
+                try write(webSocket) {
+                    cont.resume()
+                }
+            } catch {
+                cont.resume(throwing: error)
+            }
+        }
+    }
 }
 
 private extension WebSocketStream {
@@ -118,13 +146,8 @@ private extension WebSocketStream {
 	}
 
 	func didReceiveMessage(data: Data) {
-		onSend(data: data)
+		onReceive(data: data)
 	}
-}
-
-extension WebSocket {
-
-	var stream: WebSocketStream { WebSocketStream(self) }
 }
 
 extension WebSocketStream {

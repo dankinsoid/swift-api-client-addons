@@ -15,7 +15,7 @@ public extension ContentEncoder where Self == MultipartFormDataEncoder {
 
 public struct MultipartFormDataEncoder: ContentEncoder {
 
-	public static var contentType: ContentType {
+	public var contentType: ContentType {
 		.multipart(.formData)
 	}
 

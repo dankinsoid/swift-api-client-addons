@@ -23,7 +23,7 @@ private struct RetryAfterBackgroundClient: HTTPClient {
 	let retryLimit: Int?
 	let wasInBackgroundService: () -> WasInBackgroundService
 
-	func data(for request: URLRequest) async throws -> (Data, URLResponse) {
+	func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse) {
 		var count = 0
 		let didEnterBackground = wasInBackgroundService()
 		func needRetry() -> Bool {
@@ -36,14 +36,14 @@ private struct RetryAfterBackgroundClient: HTTPClient {
 			return true
 		}
 
-		func retry() async throws -> (Data, URLResponse) {
+		func retry() async throws -> (Data, HTTPURLResponse) {
 			count += 1
 			didEnterBackground.reset()
 			didEnterBackground.start()
 			return try await self.data(for: request)
 		}
 
-		let response: URLResponse
+		let response: HTTPURLResponse
 		let data: Data
 		do {
 			(data, response) = try await retry()

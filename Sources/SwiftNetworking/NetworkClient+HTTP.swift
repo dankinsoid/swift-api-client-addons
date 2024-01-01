@@ -4,14 +4,22 @@ import VDCodable
 import FoundationNetworking
 #endif
 
-public protocol HTTPClient {
+public struct HTTPClient {
 
-	func data(for request: URLRequest) async throws -> (Data, URLResponse)
+    private let _data: (URLRequest) async throws -> (Data, HTTPURLResponse)
+
+    public init(_ data: @escaping (URLRequest) async throws -> (Data, HTTPURLResponse)) {
+        _data = data
+    }
+
+    public func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse) {
+        try await _data(request)
+    }
 }
 
 public extension NetworkClient {
 
-	func httpClient(_ client: some HTTPClient) -> NetworkClient {
+	func httpClient(_ client: HTTPClient) -> NetworkClient {
 		configs(\.httpClient, client)
 	}
 }
@@ -26,53 +34,31 @@ public extension NetworkClient.Configs {
 
 public extension NetworkClient {
 
-	func response(
-		fileID: String = #fileID,
-		line: UInt = #line
-	) async throws -> (Data, URLResponse) {
-		try await withRequest { request, configs in
-			do {
-				configs.logger.debug("Start a request \(request.description)")
-				let (data, response) = try await configs.httpClient.data(for: request)
-				configs.logger.debug("Response")
-				return (data, response)
-			} catch {
-				configs.logger.error("Request \(request.description) failed with error: `\(error.localizedDescription)`")
-				throw error
-			}
-		}
-	}
-}
-
-public extension NetworkClient {
-
-	func data(
-		fileID: String = #fileID,
-		line: UInt = #line
-	) async throws -> Data {
-		try await response(fileID: fileID, line: line).0
-	}
-
-	func json(
-		fileID: String = #fileID,
-		line: UInt = #line
-	) async throws -> JSON {
-		try await JSON(from: response(fileID: fileID, line: line).0)
-	}
-
-	func decodable<Output: Decodable>(
-		_ type: Output.Type = Output.self,
-		fileID: String = #fileID,
-		line: UInt = #line
-	) async throws -> Output {
-		let data = try await data(fileID: fileID, line: line)
-		return try withConfigs { configs in
-			do {
-				return try configs.bodyDecoder.decode(type, from: data)
-			} catch {
-				configs.logger.error("Data decoding failed with error: `\(error.localizedDescription)`")
-				throw error
-			}
-		}
-	}
+    func http<T>(
+        _ serializer: Serializer<Data, T>,
+        fileID: String = #fileID,
+        line: UInt = #line
+    ) async throws -> T {
+        try await withRequest { request, configs in
+            do {
+                configs.logger.debug("Start a request \(request.description)")
+                try configs.requestValidator.validate(request)
+                let (data, response) = try await configs.httpClient.data(for: request)
+                configs.logger.debug("Response")
+                do {
+                    try configs.responseValidator.validate(response, data: data)
+                    return try serializer.serialize(data, configs)
+                } catch {
+                    if let failure = configs.errorDecoder.decodeError(from: data) {
+                        configs.logger.debug("Response failed with error: `\(error)`")
+                        throw failure
+                    }
+                    throw error
+                }
+            } catch {
+                configs.logger.error("Request \(request.description) failed with error: `\(error)`")
+                throw error
+            }
+        }
+    }
 }

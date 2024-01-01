@@ -20,6 +20,7 @@ final class SwiftNetworkingTests: XCTestCase {
 			.withConfigs {
 				$0.isAuthEnabled
 			}
+            
 
 		XCTAssertFalse(disabledAuth)
 	}
@@ -42,7 +43,7 @@ struct API {
 				.query(["hm": 2])
 				.body(["hm": 3])
 				.method(.delete)
-				.json()
+                .http(.json)
 		}
 	}
 
@@ -59,7 +60,7 @@ struct API {
 				.query(["hm": 2])
 				.body(["hm": 3])
 				.method(.delete)
-				.json()
+                .http(.json)
 		}
 	}
 }

@@ -257,7 +257,7 @@ public struct HTTPHeaderKey {
 }
 
 extension HTTPHeaderKey: Hashable, Codable, ExpressibleByStringLiteral,
-	RawRepresentable, CustomStringConvertible
+	RawRepresentable, CustomStringConvertible, Equatable
 {
 
 	public var description: String { rawValue }

@@ -31,7 +31,17 @@ public extension NetworkClient {
 
 public extension NetworkClient {
 
-	func header(_ field: HTTPHeaderKey, set value: String) -> NetworkClient {
+    func header(_ header: HTTPHeader, update: Bool = true) -> NetworkClient {
+        modifyRequest {
+            if update {
+                $0.headers.update(header)
+            } else {
+                $0.headers.add(header)
+            }
+        }
+    }
+    
+	func header(_ field: HTTPHeaderKey, _ value: String) -> NetworkClient {
 		modifyRequest {
 			$0.setValue(value, forHTTPHeaderField: field.rawValue)
 		}
@@ -43,7 +53,7 @@ public extension NetworkClient {
 		}
 	}
 
-	func headers(set headers: [HTTPHeaderKey: String]) -> NetworkClient {
+	func headers(set headers: HTTPHeaders) -> NetworkClient {
 		modifyRequest {
 			for (field, value) in headers {
 				$0.setValue(value, forHTTPHeaderField: field.rawValue)
@@ -61,12 +71,23 @@ public extension NetworkClient {
 }
 
 public extension NetworkClient {
-
-	func body(_ value: any Encodable) -> NetworkClient {
-		body {
-			try $0.bodyEncoder.encode(value)
-		}
+    
+    func body<T>(_ value: T, as serializer: ContentSerializer<T>) -> NetworkClient {
+        modifyRequest { req, configs in
+            let (data, contentType) = try serializer.serialize(value, configs)
+            req.httpBodyStream = nil
+            req.httpBody = data
+            req.setValue(contentType.rawValue, forHTTPHeaderField: HTTPHeaderKey.contentType.rawValue)
+        }
+    }
+    
+	func body(_ value: some Encodable) -> NetworkClient {
+        body(value, as: .encodable)
 	}
+
+    func body(_ json: JSON) -> NetworkClient {
+        body(json, as: .json)
+    }
 
 	func body(_ data: @escaping @autoclosure () throws -> Data) -> NetworkClient {
 		body { _ in try data() }
@@ -77,24 +98,6 @@ public extension NetworkClient {
 			req.httpBodyStream = nil
 			req.httpBody = try data(configs)
 		}
-	}
-
-	func body(
-		multiparts partParams: [MultipartFormData.PartParam],
-		boundary: String? = nil
-	) -> NetworkClient {
-		try body(
-			MultipartFormData.Builder.build(
-				with: partParams,
-				willSeparateBy: boundary ?? defaultBoundary
-			).body
-		)
-		.contentType(.multipart(.formData))
-	}
-
-	func body(_ json: JSON) -> NetworkClient {
-		body(json.data)
-			.contentType(.application(.json))
 	}
 }
 
@@ -137,6 +140,6 @@ public extension NetworkClient {
 	}
 
 	func query(_ field: String, _ value: CustomStringConvertible) -> NetworkClient {
-		query([field: .string(value.description)])
+        query([URLQueryItem(name: field, value: value.description)])
 	}
 }
