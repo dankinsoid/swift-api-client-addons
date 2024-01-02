@@ -192,6 +192,7 @@ public struct HTTPHeader: Hashable {
 }
 
 extension HTTPHeader: CustomStringConvertible {
+
 	public var description: String {
 		"\(name): \(value)"
 	}

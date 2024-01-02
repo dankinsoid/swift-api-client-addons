@@ -8,6 +8,7 @@ public struct HTTPMethod: LosslessStringConvertible, RawRepresentable, Codable, 
 
 	/// The raw string value of the HTTP method (e.g., "GET", "POST").
 	public let rawValue: String
+
 	/// A textual description of the HTTP method, identical to `rawValue`.
 	public var description: String { rawValue }
 

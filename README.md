@@ -261,7 +261,9 @@ The library is designed for flexibility and can be easily customized to suit dif
 - **Custom Encoders and Decoders**: Easily implement custom logic for request and response processing.
 - **Authentication Handling**: Seamlessly integrate authentication mechanisms.
 - **Error Handling and Logging**: Customize how errors are handled and logged.
-- [Other customization options]
+
+## Testing
+Swift-Networking supports easy testing and mocking of network clients, making it simple to write unit tests for your networking code.
 
 ## Installation
 
@@ -298,9 +300,6 @@ dankinsoid, voidilov@gmail.com
 ## License
 
 swift-networking is available under the MIT license. See the LICENSE file for more info.
-
-## Testing
-Swift-Networking supports easy testing and mocking of network clients, making it simple to write unit tests for your networking code.
 
 ## Contributing
 We welcome contributions to Swift-Networking! Please read our contributing guidelines to get started.

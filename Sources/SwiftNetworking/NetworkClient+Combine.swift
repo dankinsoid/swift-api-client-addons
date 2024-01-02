@@ -10,41 +10,26 @@ public extension NetworkClient {
 		fileID: String = #fileID,
 		line: UInt = #line
 	) -> AnyPublisher<T, Error> {
-		Publishers.Create { onOutput, onCompletion in
-			Task {
-				do {
-					try await onOutput(http(serializer, fileID: fileID, line: line))
-				} catch is CancellationError {
-					onCompletion(.finished)
-				} catch {
-					onCompletion(.failure(error))
-				}
-			}
+		Publishers.Task<T, Error> {
+			try await http(serializer, fileID: fileID, line: line)
 		}
 		.eraseToAnyPublisher()
 	}
+}
 
-	/// Creates a publisher that performs a web socket network connection and decodes the response body.
-	func webSocketPublisher<T>(
-		_ serializer: Serializer<Data, T>,
-		fileID: String = #fileID,
-		line: UInt = #line
-	) -> AnyPublisher<T, Error> {
-		Publishers.Create { onOutput, onCompletion in
-			Task {
-				do {
-					for try await output in try webSocket(serializer, fileID: fileID, line: line) {
-						try Task.checkCancellation()
-						onOutput(output)
-					}
-				} catch is CancellationError {
-					onCompletion(.finished)
-				} catch {
-					onCompletion(.failure(error))
-				}
+extension WebSocketChannel: Publisher {
+
+	public typealias Output = Element
+	public typealias Failure = Error
+
+	public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
+		Publishers.Task<Output, Failure> { send in
+			for try await output in self {
+				try Task.checkCancellation()
+				send(output)
 			}
 		}
-		.eraseToAnyPublisher()
+		.receive(subscriber: subscriber)
 	}
 }
 #endif
