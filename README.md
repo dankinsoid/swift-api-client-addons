@@ -15,7 +15,7 @@ Swift-Networking is a modern, comprehensive, and modular networking library for 
 [Instructions for installing and integrating the library in a Swift project]
 
 ## Usage
-Below is an example of using Swift-Networking to create an API client for a Petstore:
+Below is an example of using Swift-Networking to create an API client for a [Petstore](https://petstore3.swagger.io):
 
 ```swift
 struct Petstore {
@@ -208,6 +208,8 @@ struct Petstore {
     }
   }
 }
+
+// MARK: - Custom authentication methods
 
 extension NetworkClient.Configs {
 
