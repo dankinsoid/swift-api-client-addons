@@ -1,24 +1,32 @@
 import Foundation
 import Reachability
 
+/// A protocol for monitoring and waiting for network reachability changes.
 public protocol ReachabilityService {
 
+	/// The current network connection status.
 	var connection: Reachability.Connection { get }
+
+	/// Waits asynchronously for a network connection that satisfies the given condition.
+	/// - Parameter connection: A closure that evaluates whether a given `Reachability.Connection` meets the desired criteria.
 	func wait(for connection: @escaping (Reachability.Connection) -> Bool) async
 }
 
 public extension ReachabilityService {
 
+	/// Indicates whether there is an available network connection.
 	var isReachable: Bool {
 		connection != .unavailable
 	}
 
+	/// Waits asynchronously until the specified network connection status is met.
 	func wait(for connection: Reachability.Connection) async {
 		await wait {
 			$0 == connection
 		}
 	}
 
+	/// Waits asynchronously until a network connection becomes available.
 	func waitReachable() async {
 		await wait {
 			$0 != .unavailable
@@ -26,10 +34,12 @@ public extension ReachabilityService {
 	}
 }
 
+/// A mock implementation of `ReachabilityService`, primarily for testing purposes.
 public struct MockReachabilityService: ReachabilityService {
 
 	public var connection: Reachability.Connection
 
+	/// Initializes the service with a mock connection status.
 	public init(connection: Reachability.Connection = .wifi) {
 		self.connection = connection
 	}
@@ -37,10 +47,13 @@ public struct MockReachabilityService: ReachabilityService {
 	public func wait(for connection: @escaping (Reachability.Connection) -> Bool) async {}
 }
 
+/// A default implementation of `ReachabilityService` using the `Reachability` framework.
 public final actor DefaultReachabilityService: ReachabilityService {
 
+	/// Shared instance of `DefaultReachabilityService`.
 	public static let shared = DefaultReachabilityService()
 
+	/// The current network connection status, nonisolated to the actor context.
 	public nonisolated var connection: Reachability.Connection {
 		reachability?.connection ?? .unavailable
 	}
@@ -57,6 +70,10 @@ public final actor DefaultReachabilityService: ReachabilityService {
 		self.init(reachability: try? Reachability())
 	}
 
+	/// Waits asynchronously for a network connection that satisfies the given condition.
+	///
+	/// - Parameters:
+	///		- connection: A closure that evaluates whether a given `Reachability.Connection` meets the desired criteria.
 	public func wait(for connection: @escaping (Reachability.Connection) -> Bool) async {
 		guard !connection(self.connection) else { return }
 		startIfNeeded()
@@ -104,6 +121,7 @@ public final actor DefaultReachabilityService: ReachabilityService {
 
 public extension ReachabilityService where Self == DefaultReachabilityService {
 
+	/// A convenient static property to access the shared default reachability service.
 	static var `default`: DefaultReachabilityService {
 		.shared
 	}

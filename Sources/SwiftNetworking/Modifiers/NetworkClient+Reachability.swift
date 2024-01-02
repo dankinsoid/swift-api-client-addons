@@ -6,6 +6,14 @@ import FoundationNetworking
 
 public extension NetworkClient {
 
+	/// Configures the network client to wait for a network connection before sending requests,
+	/// with an optional retry mechanism for failed requests.
+	/// - Parameters:
+	///   - retryLimit: An optional integer specifying the maximum number of retries for a request.
+	///                 If `nil`, it will keep retrying as long as the network is unreachable.
+	///   - reachabilityService: A `ReachabilityService` instance to monitor network reachability.
+	///                          Defaults to `.default`.
+	/// - Returns: An instance of `NetworkClient` configured to handle network connectivity and retry logic.
 	func waitForConnection(
 		retryLimit: Int? = nil,
 		reachabilityService: ReachabilityService = .default

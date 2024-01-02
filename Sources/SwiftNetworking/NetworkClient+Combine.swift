@@ -4,6 +4,7 @@ import Foundation
 
 public extension NetworkClient {
 
+	/// Creates a publisher that performs a http network request and decodes the response body.
 	func httpPublisher<T>(
 		_ serializer: Serializer<Data, T>,
 		fileID: String = #fileID,
@@ -23,6 +24,7 @@ public extension NetworkClient {
 		.eraseToAnyPublisher()
 	}
 
+	/// Creates a publisher that performs a web socket network connection and decodes the response body.
 	func webSocketPublisher<T>(
 		_ serializer: Serializer<Data, T>,
 		fileID: String = #fileID,

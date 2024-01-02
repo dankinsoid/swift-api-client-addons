@@ -1,10 +1,14 @@
 import Foundation
 
+/// Represents a MIME content type with support for type, subtype, and parameters.
+///
+/// Example: `.application(.json)` = `application/json`
 public struct ContentType: Codable, Hashable, RawRepresentable, ExpressibleByStringLiteral, LosslessStringConvertible {
 
 	public typealias RawValue = String
 	public typealias StringLiteralType = String
 
+	/// A string representation of the content type, including type, subtype, and parameters.
 	public var rawValue: String {
 		get {
 			(["\(type)/\(subtype)"] + parameters.map { "\($0.key)=\($0.value)" }.sorted())
@@ -15,12 +19,19 @@ public struct ContentType: Codable, Hashable, RawRepresentable, ExpressibleByStr
 		}
 	}
 
+	/// A textual description of the content type.
 	public var description: String { rawValue }
 
+	/// The primary type of the content.
 	public var type: String
+
+	/// The subtype of the content.
 	public var subtype: String
+
+	/// A dictionary of parameters associated with the content type.
 	public var parameters: [String: String]
 
+	/// Initializes a new `ContentType` with the specified type, subtype, and optional parameters.
 	public init(
 		_ type: String,
 		_ subtype: String,
@@ -31,6 +42,7 @@ public struct ContentType: Codable, Hashable, RawRepresentable, ExpressibleByStr
 		self.parameters = parameters
 	}
 
+	/// Initializes a new `ContentType` from a raw string value.
 	public init(rawValue: String) {
 		var type = ""
 		var index = rawValue.startIndex
@@ -90,7 +102,9 @@ public struct ContentType: Codable, Hashable, RawRepresentable, ExpressibleByStr
 
 public extension ContentType {
 
+	/// Predefined application content types.
 	struct Application: RawRepresentable, ExpressibleByStringLiteral {
+
 		public var rawValue: String
 
 		public init(rawValue: RawValue) {
@@ -101,19 +115,29 @@ public extension ContentType {
 			self.init(rawValue: value)
 		}
 
+		/// `json`
 		public static let json: Application = "json"
+		/// `schema+json`
 		public static let schemaJson: Application = "schema+json"
+		/// `schema-instance+json`
 		public static let schemaInstanceJson: Application = "schema-instance+json"
+		/// `xml`
 		public static let xml: Application = "xml"
+		/// `octet-stream`
 		public static let octetStream: Application = "octet-stream"
+		/// `x-www-form-urlencoded`
 		public static let urlEncoded: Application = "x-www-form-urlencoded"
 	}
 
+	/// Creates a content type for `application` with a specific subtype. You can use a string literal as well.
+	/// Example: `application/json`
 	static func application(_ subtype: Application) -> ContentType {
 		ContentType("application", subtype.rawValue)
 	}
 
+	/// Predefined text content types.
 	struct Text: RawRepresentable, ExpressibleByStringLiteral {
+
 		public var rawValue: String
 
 		public init(rawValue: RawValue) {
@@ -124,10 +148,14 @@ public extension ContentType {
 			self.init(rawValue: value)
 		}
 
+		/// `plain`
 		public static let plain: Text = "plain"
+		/// `html`
 		public static let html: Text = "html"
 	}
 
+	/// Creates a content type for `text` with a specific subtype and optional charset. You can use a string literal as well.
+	/// Example: `text/plain; charset=utf-8`
 	static func text(_ subtype: Text, charset: String? = nil) -> ContentType {
 		ContentType(
 			"text",
@@ -136,6 +164,7 @@ public extension ContentType {
 		)
 	}
 
+	/// Predefined multipart content types.
 	struct Multipart: RawRepresentable, ExpressibleByStringLiteral {
 
 		public var rawValue: String
@@ -148,13 +177,18 @@ public extension ContentType {
 			self.init(rawValue: value)
 		}
 
+		/// `form-data`
 		public static let formData: Multipart = "form-data"
+		/// `byteranges`
 		public static let byteranges: Multipart = "byteranges"
 	}
 
+	/// Creates a content type for `multipart` with a specific subtype. You can use a string literal as well.
+	/// Example: `multipart/form-data`
 	static func multipart(_ subtype: Multipart) -> ContentType {
 		ContentType("multipart", subtype.rawValue)
 	}
 
+	/// `*/*`
 	static let any = ContentType("*", "*")
 }

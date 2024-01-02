@@ -6,44 +6,32 @@ import FoundationNetworking
 
 public extension NetworkClient {
 
-//	func mapResponse(_ mapper: @escaping (Data) throws -> Data) -> NetworkClient {
-//		configs {
-//			$0.httpClient = MapResponseClient(
-//				base: $0.httpClient,
-//				mapper: mapper
-//			)
-//			$0.webSocketClient = MapStreamClient(
-//				base: $0.webSocketClient,
-//				mapper: mapper
-//			)
-//		}
-//	}
+	/// Configures the network client to transform the response data using a provided mapping function.
+	/// - Parameter mapper: A closure that takes `Data` and returns transformed `Data`.
+	/// - Returns: An instance of `NetworkClient` configured with the specified response data transformation.
+	/// - Note: This modifier is applied to both `HTTPClient` and `WebSocketClient`.
+	func mapResponse(_ mapper: @escaping (Data) throws -> Data) -> NetworkClient {
+		configs {
+			let httpClient = $0.httpClient
+			$0.httpClient = HTTPClient { request, configs in
+				var (data, response) = try await httpClient.data(request, configs)
+				data = try mapper(data)
+				return (data, response)
+			}
 
+			let webSocketClient = $0.webSocketClient
+			$0.webSocketClient = WebSocketClient { request, configs in
+				try webSocketClient.connect(request, configs).map(mapper)
+			}
+		}
+	}
+
+	/// Configures the network client to use a custom decoder as specified by the provided mapping function.
+	/// - Parameter mapper: A closure that takes an existing `DataDecoder` and returns a modified `DataDecoder`.
+	/// - Returns: An instance of `NetworkClient` configured with the specified decoder.
 	func mapDecoder(_ mapper: @escaping (any DataDecoder) -> any DataDecoder) -> NetworkClient {
 		configs {
 			$0.bodyDecoder = mapper($0.bodyDecoder)
 		}
 	}
 }
-
-// private struct MapStreamClient: WebSocketClient {
-//
-//	let base: WebSocketClient
-//	let mapper: (Data) throws -> Data
-//
-//	func stream(for request: URLRequest) throws -> AnyAsyncSequence<Data> {
-//		try base.stream(for: request).map(mapper).eraseToAnyAsyncSequence()
-//	}
-// }
-//
-// private struct MapResponseClient: HTTPClient {
-//
-//	let base: HTTPClient
-//	let mapper: (Data) throws -> Data
-//
-//	func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse) {
-//		var (data, response) = try await base.data(for: request)
-//		data = try mapper(data)
-//		return (data, response)
-//	}
-// }

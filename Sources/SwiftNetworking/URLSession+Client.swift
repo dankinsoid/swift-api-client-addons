@@ -6,6 +6,9 @@ import FoundationNetworking
 
 public extension HTTPClient {
 
+	/// Creates an `HTTPClient` that uses a specified `URLSession` for network requests.
+	/// - Parameter session: The `URLSession` to use for network requests.
+	/// - Returns: An `HTTPClient` that uses the given `URLSession` to fetch data.
 	static func urlSession(_ session: URLSession) -> Self {
 		HTTPClient { request, _ in
 			#if os(Linux)
@@ -21,6 +24,7 @@ public extension HTTPClient {
 		}
 	}
 
+	/// A static property to get an `HTTPClient` that uses the shared `URLSession`.
 	static var urlSession: Self {
 		urlSession(.shared)
 	}
