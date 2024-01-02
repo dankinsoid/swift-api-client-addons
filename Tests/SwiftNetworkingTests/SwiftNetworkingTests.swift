@@ -57,15 +57,15 @@ struct Petstore {
 	}
 
 	var pet: Pet {
-		Pet(client: client.path("pet").auth(enabled: true))
+		Pet(client: client["pet"].auth(enabled: true))
 	}
 
 	var store: Store {
-		Store(client: client.path("store"))
+		Store(client: client["store"])
 	}
 
 	var user: User {
-		User(client: client.path("user"))
+		User(client: client["user"])
 	}
 
 	struct Pet {
@@ -87,15 +87,13 @@ struct Petstore {
 		}
 
 		func findBy(status: PetStatus) async throws -> [PetModel] {
-			try await client
-				.path("findByStatus")
+			try await client["findByStatus"]
 				.query("status", status)
 				.http(.decodable)
 		}
 
 		func findBy(tags: [String]) async throws -> [PetModel] {
-			try await client
-				.path("findByTags")
+			try await client["findByTags"]
 				.query("tags", tags)
 				.http(.decodable)
 		}
@@ -127,8 +125,7 @@ struct Petstore {
 			}
 
 			func uploadImage(_ image: Data, additionalMetadata: String? = nil) async throws {
-				try await client
-					.path("uploadImage")
+				try await client["uploadImage"]
 					.method(.post)
 					.query("additionalMetadata", additionalMetadata)
 					.body(image)
@@ -143,15 +140,13 @@ struct Petstore {
 		var client: NetworkClient
 
 		func inventory() async throws -> [String: Int] {
-			try await client
-				.path("inventory")
+			try await client["inventory"]
 				.auth(enabled: true)
 				.http(.decodable)
 		}
 
 		func order(_ model: OrderModel) async throws -> OrderModel {
-			try await client
-				.path("order")
+			try await client["order"]
 				.body(model)
 				.method(.post)
 				.http(.decodable)
@@ -190,24 +185,20 @@ struct Petstore {
 		}
 
 		func createWith(list: [UserModel]) async throws {
-			try await client
-				.path("createWithList")
+			try await client["createWithList"]
 				.method(.post)
 				.body(list)
 				.http(.void)
 		}
 
 		func login(username: String, password: String) async throws -> String {
-			try await client
-				.path("login")
-				.query(["username": username, "password": password])
+			try await client["login"]
+				.query(LoginQuery(username: username, password: password))
 				.http(.decodable)
 		}
 
 		func logout() async throws {
-			try await client
-				.path("logout")
-				.http(.void)
+			try await client["logout"].http(.void)
 		}
 
 		func callAsFunction(_ username: String) -> UserByUsername {
@@ -266,6 +257,12 @@ extension NetworkClient {
 	func auth(enabled: Bool) -> NetworkClient {
 		configs(\.isAuthEnabled, enabled)
 	}
+}
+
+struct LoginQuery: Codable {
+
+	var username: String
+	var password: String
 }
 
 struct UserModel: Codable {

@@ -10,6 +10,13 @@ public extension NetworkClient {
 	/// Appends path components to the URL of the request.
 	/// - Parameter components: A variadic list of components that conform to `CustomStringConvertible`.
 	/// - Returns: An instance of `NetworkClient` with updated path.
+	subscript(_ components: any CustomStringConvertible...) -> NetworkClient {
+		path(components)
+	}
+
+	/// Appends path components to the URL of the request.
+	/// - Parameter components: A variadic list of components that conform to `CustomStringConvertible`.
+	/// - Returns: An instance of `NetworkClient` with updated path.
 	func path(_ components: any CustomStringConvertible...) -> NetworkClient {
 		path(components)
 	}
