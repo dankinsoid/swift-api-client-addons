@@ -6,7 +6,7 @@ final actor WebSocketStream: AsyncSequence {
 	typealias Element = Data
 	typealias AsyncIterator = AsyncThrowingStream<Data, Error>.AsyncIterator
 	let webSocket: WebSocket
-	let pingInterval: Double
+	let pingInterval: Double?
 	private var continuations: [UUID: AsyncThrowingStream<Data, Error>.Continuation] = [:]
 	private var pingTask: Task<Void, Error>?
 	private(set) var isConnected = false
@@ -14,7 +14,7 @@ final actor WebSocketStream: AsyncSequence {
 
 	init(
 		_ webSocket: WebSocket,
-		pingInterval: Double = 15.0
+		pingInterval: Double?
 	) {
 		self.webSocket = webSocket
 		self.pingInterval = pingInterval
@@ -30,17 +30,17 @@ final actor WebSocketStream: AsyncSequence {
 		.makeAsyncIterator()
 	}
 
-    func send(_ string: String) async throws {
-        try await send {
-            $0.write(string: string, completion: $1)
-        }
-    }
+	func send(_ string: String) async throws {
+		try await send {
+			$0.write(string: string, completion: $1)
+		}
+	}
 
-    func send(_ data: Data) async throws {
-        try await send {
-            $0.write(data: data, completion: $1)
-        }
-    }
+	func send(_ data: Data) async throws {
+		try await send {
+			$0.write(data: data, completion: $1)
+		}
+	}
 
 	private func receive(continuation: AsyncThrowingStream<Data, Error>.Continuation) {
 		guard !isFinished else {
@@ -57,10 +57,12 @@ final actor WebSocketStream: AsyncSequence {
 		guard !isConnected else {
 			return
 		}
-		pingTask = Task.detached { [weak self, pingInterval] in
-			while !Task.isCancelled {
-				try await Task.sleep(nanoseconds: UInt64(pingInterval * 1_000_000_000))
-				self?.webSocket.write(ping: Data())
+		if let pingInterval {
+			pingTask = Task.detached { [weak self, pingInterval] in
+				while !Task.isCancelled {
+					try await Task.sleep(nanoseconds: UInt64(pingInterval * 1_000_000_000))
+					self?.webSocket.write(ping: Data())
+				}
 			}
 		}
 		webSocket.connect()
@@ -105,22 +107,22 @@ final actor WebSocketStream: AsyncSequence {
 			finish()
 		}
 	}
-    
-    private func send(write: (WebSocket, _ completion: (() -> Void)?) throws -> Void) async throws {
-        let _: Void = try await withCheckedThrowingContinuation { [self] cont in
-            guard isConnected else {
-                cont.resume(throwing: Errors.notConnected)
-                return
-            }
-            do {
-                try write(webSocket) {
-                    cont.resume()
-                }
-            } catch {
-                cont.resume(throwing: error)
-            }
-        }
-    }
+
+	private func send(write: (WebSocket, _ completion: (() -> Void)?) throws -> Void) async throws {
+		let _: Void = try await withCheckedThrowingContinuation { [self] cont in
+			guard isConnected else {
+				cont.resume(throwing: Errors.notConnected)
+				return
+			}
+			do {
+				try write(webSocket) {
+					cont.resume()
+				}
+			} catch {
+				cont.resume(throwing: error)
+			}
+		}
+	}
 }
 
 private extension WebSocketStream {

@@ -3,7 +3,7 @@ import Foundation
 import FoundationNetworking
 #endif
 
-//public extension NetworkClient {
+// public extension NetworkClient {
 //
 //	func retry(limit: Int?) -> NetworkClient {
 //		configs {
@@ -13,9 +13,9 @@ import FoundationNetworking
 //			)
 //		}
 //	}
-//}
+// }
 //
-//private struct RetryClient: HTTPClient {
+// private struct RetryClient: HTTPClient {
 //
 //	let base: HTTPClient
 //	let retryLimit: Int?
@@ -49,4 +49,4 @@ import FoundationNetworking
 //		}
 //		return (data, response)
 //	}
-//}
+// }

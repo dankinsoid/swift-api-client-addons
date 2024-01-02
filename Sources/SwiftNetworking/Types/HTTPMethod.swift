@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 public struct HTTPMethod: LosslessStringConvertible, RawRepresentable, Codable, Hashable, ExpressibleByStringLiteral {
 
@@ -33,4 +36,12 @@ public struct HTTPMethod: LosslessStringConvertible, RawRepresentable, Codable, 
 	public static let head = HTTPMethod("HEAD")
 	public static let patch = HTTPMethod("PATCH")
 	public static let trace = HTTPMethod("TRACE")
+}
+
+public extension URLRequest {
+
+	var method: HTTPMethod? {
+		get { httpMethod.map { HTTPMethod($0) } }
+		set { httpMethod = newValue?.rawValue }
+	}
 }

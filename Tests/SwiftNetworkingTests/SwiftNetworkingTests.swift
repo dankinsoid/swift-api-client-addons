@@ -7,22 +7,25 @@ final class SwiftNetworkingTests: XCTestCase {
 	private let client = NetworkClient(baseURL: URL(string: "https://tests.com")!)
 
 	func testConfigs() throws {
-		let enabledAuth = client
-			.enableAuth()
-			.withConfigs {
-				$0.isAuthEnabled
-			}
+		let enabled = client
+			.configs(\.testValue, true)
+			.withConfigs(\.testValue)
 
-		XCTAssertTrue(enabledAuth)
+		XCTAssertTrue(enabled)
 
-		let disabledAuth = client
-			.disableAuth()
-			.withConfigs {
-				$0.isAuthEnabled
-			}
-            
+		let disabled = client
+			.configs(\.testValue, false)
+			.withConfigs(\.testValue)
 
-		XCTAssertFalse(disabledAuth)
+		XCTAssertFalse(disabled)
+	}
+}
+
+extension NetworkClient.Configs {
+
+	var testValue: Bool {
+		get { self[\.testValue] ?? false }
+		set { self[\.testValue] = newValue }
 	}
 }
 
@@ -43,7 +46,7 @@ struct API {
 				.query(["hm": 2])
 				.body(["hm": 3])
 				.method(.delete)
-                .http(.json)
+				.http(.json)
 		}
 	}
 
@@ -60,7 +63,7 @@ struct API {
 				.query(["hm": 2])
 				.body(["hm": 3])
 				.method(.delete)
-                .http(.json)
+				.http(.json)
 		}
 	}
 }

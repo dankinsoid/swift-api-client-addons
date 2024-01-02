@@ -84,28 +84,28 @@ public struct NetworkClient {
 		do {
 			return try (_createRequest(configs), configs)
 		} catch {
-			configs.logger.error("Request creation failed with error: `\(error.localizedDescription)`")
+			configs.logger.error("Request creation failed with error: `\(error.humanReadable)`")
 			throw error
 		}
 	}
-    
-    public func defaultFor<Value>(
-        live: @autoclosure () -> Value,
-        test: @autoclosure () -> Value? = nil,
-        preview: @autoclosure () -> Value? = nil
-    ) -> Value {
-#if DEBUG
-        if _isPreview {
-            return preview() ?? test() ?? live()
-        } else if _XCTIsTesting {
-            return test() ?? preview() ?? live()
-        } else {
-            return live()
-        }
-#else
-        return live()
-#endif
-    }
+
+	public func defaultFor<Value>(
+		live: @autoclosure () -> Value,
+		test: @autoclosure () -> Value? = nil,
+		preview: @autoclosure () -> Value? = nil
+	) -> Value {
+		#if DEBUG
+		if _isPreview {
+			return preview() ?? test() ?? live()
+		} else if _XCTIsTesting {
+			return test() ?? preview() ?? live()
+		} else {
+			return live()
+		}
+		#else
+		return live()
+		#endif
+	}
 }
 
 private let _XCTIsTesting: Bool = ProcessInfo.processInfo.environment.keys.contains("XCTestBundlePath")

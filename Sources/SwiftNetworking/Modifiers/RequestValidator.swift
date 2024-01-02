@@ -3,48 +3,39 @@ import Foundation
 import FoundationNetworking
 #endif
 
-public protocol RequestValidator {
-    
-    func validate(_ response: URLRequest) throws
+public struct RequestValidator {
+
+	public var validate: (_ request: URLRequest) throws -> Void
+
+	public init(validate: @escaping (_ request: URLRequest) throws -> Void) {
+		self.validate = validate
+	}
 }
 
-public struct AlwaysSuccessRequestValidator: RequestValidator {
-    
-    public init() {}
-    
-    public func validate(_ response: URLRequest) throws {}
-}
+public extension RequestValidator {
 
-extension RequestValidator where Self == AlwaysSuccessRequestValidator {
-    
-    public static var alwaysSuccess: Self {
-        AlwaysSuccessRequestValidator()
-    }
+	static var alwaysSuccess: Self {
+		RequestValidator { _ in }
+	}
 }
 
 public extension NetworkClient.Configs {
-    
-    var requestValidator: RequestValidator {
-        get { self[\.requestValidator] ?? .alwaysSuccess }
-        set { self[\.requestValidator] = newValue }
-    }
+
+	var requestValidator: RequestValidator {
+		get { self[\.requestValidator] ?? .alwaysSuccess }
+		set { self[\.requestValidator] = newValue }
+	}
 }
 
 public extension NetworkClient {
-    
-    func requestValidator(_ validator: some RequestValidator) -> NetworkClient {
-        configs {
-            $0.requestValidator = ChainRequestValidator(validator: ($0.requestValidator, validator))
-        }
-    }
-}
 
-private struct ChainRequestValidator: RequestValidator {
-    
-    let validator: (RequestValidator, RequestValidator)
-    
-    func validate(_ request: URLRequest) throws {
-        try validator.0.validate(request)
-        try validator.1.validate(request)
-    }
+	func requestValidator(_ validator: RequestValidator) -> NetworkClient {
+		configs {
+			let old = $0.requestValidator.validate
+			$0.requestValidator = RequestValidator {
+				try old($0)
+				try validator.validate($0)
+			}
+		}
+	}
 }

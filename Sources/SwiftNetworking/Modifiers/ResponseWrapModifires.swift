@@ -26,7 +26,7 @@ public extension NetworkClient {
 	}
 }
 
-//private struct MapStreamClient: WebSocketClient {
+// private struct MapStreamClient: WebSocketClient {
 //
 //	let base: WebSocketClient
 //	let mapper: (Data) throws -> Data
@@ -34,9 +34,9 @@ public extension NetworkClient {
 //	func stream(for request: URLRequest) throws -> AnyAsyncSequence<Data> {
 //		try base.stream(for: request).map(mapper).eraseToAnyAsyncSequence()
 //	}
-//}
+// }
 //
-//private struct MapResponseClient: HTTPClient {
+// private struct MapResponseClient: HTTPClient {
 //
 //	let base: HTTPClient
 //	let mapper: (Data) throws -> Data
@@ -46,4 +46,4 @@ public extension NetworkClient {
 //		data = try mapper(data)
 //		return (data, response)
 //	}
-//}
+// }

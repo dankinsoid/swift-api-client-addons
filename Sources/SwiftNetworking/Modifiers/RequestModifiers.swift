@@ -24,70 +24,54 @@ public extension NetworkClient {
 
 	func method(_ method: HTTPMethod) -> NetworkClient {
 		modifyRequest {
-			$0.httpMethod = method.rawValue
+			$0.method = method
 		}
 	}
 }
 
 public extension NetworkClient {
 
-    func header(_ header: HTTPHeader, update: Bool = true) -> NetworkClient {
-        modifyRequest {
-            if update {
-                $0.headers.update(header)
-            } else {
-                $0.headers.add(header)
-            }
-        }
-    }
-    
-	func header(_ field: HTTPHeaderKey, _ value: String) -> NetworkClient {
+	func headers(_ headers: HTTPHeader..., update: Bool = false) -> NetworkClient {
 		modifyRequest {
-			$0.setValue(value, forHTTPHeaderField: field.rawValue)
-		}
-	}
-
-	func header(_ field: HTTPHeaderKey, add value: String) -> NetworkClient {
-		modifyRequest {
-			$0.addValue(value, forHTTPHeaderField: field.rawValue)
-		}
-	}
-
-	func headers(set headers: HTTPHeaders) -> NetworkClient {
-		modifyRequest {
-			for (field, value) in headers {
-				$0.setValue(value, forHTTPHeaderField: field.rawValue)
+			for header in headers {
+				if update {
+					$0.setValue(header.value, forHTTPHeaderField: header.name.rawValue)
+				} else {
+					$0.addValue(header.value, forHTTPHeaderField: header.name.rawValue)
+				}
 			}
 		}
 	}
 
-	func headers(add headers: [HTTPHeaderKey: String]) -> NetworkClient {
+	func removeHeader(_ field: HTTPHeader.Key) -> NetworkClient {
 		modifyRequest {
-			for (field, value) in headers {
-				$0.addValue(value, forHTTPHeaderField: field.rawValue)
-			}
+			$0.setValue(nil, forHTTPHeaderField: field.rawValue)
 		}
+	}
+
+	func header(_ field: HTTPHeader.Key, _ value: String, update: Bool = false) -> NetworkClient {
+		headers(HTTPHeader(field, value), update: update)
 	}
 }
 
 public extension NetworkClient {
-    
-    func body<T>(_ value: T, as serializer: ContentSerializer<T>) -> NetworkClient {
-        modifyRequest { req, configs in
-            let (data, contentType) = try serializer.serialize(value, configs)
-            req.httpBodyStream = nil
-            req.httpBody = data
-            req.setValue(contentType.rawValue, forHTTPHeaderField: HTTPHeaderKey.contentType.rawValue)
-        }
-    }
-    
+
+	func body<T>(_ value: T, as serializer: ContentSerializer<T>) -> NetworkClient {
+		modifyRequest { req, configs in
+			let (data, contentType) = try serializer.serialize(value, configs)
+			req.httpBodyStream = nil
+			req.httpBody = data
+			req.setValue(contentType.rawValue, forHTTPHeaderField: HTTPHeader.Key.contentType.rawValue)
+		}
+	}
+
 	func body(_ value: some Encodable) -> NetworkClient {
-        body(value, as: .encodable)
+		body(value, as: .encodable)
 	}
 
-    func body(_ json: JSON) -> NetworkClient {
-        body(json, as: .json)
-    }
+	func body(_ json: JSON) -> NetworkClient {
+		body(json, as: .json)
+	}
 
 	func body(_ data: @escaping @autoclosure () throws -> Data) -> NetworkClient {
 		body { _ in try data() }
@@ -140,6 +124,6 @@ public extension NetworkClient {
 	}
 
 	func query(_ field: String, _ value: CustomStringConvertible) -> NetworkClient {
-        query([URLQueryItem(name: field, value: value.description)])
+		query([URLQueryItem(name: field, value: value.description)])
 	}
 }
