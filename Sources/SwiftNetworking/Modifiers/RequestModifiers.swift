@@ -168,19 +168,39 @@ public extension NetworkClient {
 	/// Adds URL query parameters using a dictionary of JSON objects.
 	/// - Parameter json: A dictionary of `String: JSON` pairs to be used as query parameters.
 	/// - Returns: An instance of `NetworkClient` with set query parameters.
-	func query(_ json: [String: JSON]) -> NetworkClient {
-		query(
-			json.sorted(by: { $0.key < $1.key })
-				.map { URLQueryItem(name: $0.key, value: $0.value.description) }
-		)
+	func query(_ parameters: [String: Encodable?]) -> NetworkClient {
+		query {
+			try $0.queryEncoder
+				.encode(parameters.compactMapValues { $0.map { AnyEncodable($0) }})
+				.sorted(by: { $0.name < $1.name })
+		}
 	}
 
 	/// Adds a single URL query parameter.
 	/// - Parameters:
 	///   - field: The field name of the query parameter.
-	///   - value: The value of the query parameter, conforming to `CustomStringConvertible`.
+	///   - value: The value of the query parameter.
 	/// - Returns: An instance of `NetworkClient` with the specified query parameter.
-	func query(_ field: String, _ value: CustomStringConvertible) -> NetworkClient {
-		query([URLQueryItem(name: field, value: value.description)])
+	func query(_ field: String, _ value: String?) -> NetworkClient {
+		query(value.map { [URLQueryItem(name: field, value: $0)] } ?? [])
+	}
+
+	/// Adds a single URL query parameter.
+	/// - Parameters:
+	///   - field: The field name of the query parameter.
+	///   - value: The value of the query parameter, conforming to `RawRepresentable`.
+	/// - Returns: An instance of `NetworkClient` with the specified query parameter.
+	func query<R: RawRepresentable>(_ field: String, _ value: R?) -> NetworkClient where R.RawValue == String {
+		query(field, value?.rawValue)
+	}
+
+	/// Adds a single URL query parameter.
+	/// - Parameters:
+	///   - field: The field name of the query parameter.
+	///   - value: The value of the query parameter, conforming to `Encodable`.
+	/// - Returns: An instance of `NetworkClient` with the specified query parameter.
+	@_disfavoredOverload
+	func query(_ field: String, _ value: Encodable?) -> NetworkClient {
+		query([field: value])
 	}
 }
