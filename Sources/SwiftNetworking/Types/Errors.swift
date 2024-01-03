@@ -7,6 +7,7 @@ enum Errors: LocalizedError {
 	case notConnected
 	case mockIsMissed(Any.Type)
 	case unimplemented
+	case responseTypeIsNotHTTP
 
 	var errorDescription: String? {
 		switch self {
@@ -20,6 +21,8 @@ enum Errors: LocalizedError {
 			return "Mock for \(type) is missed"
 		case .unimplemented:
 			return "Unimplemented"
+		case .responseTypeIsNotHTTP:
+			return "Response type is not HTTP"
 		}
 	}
 }

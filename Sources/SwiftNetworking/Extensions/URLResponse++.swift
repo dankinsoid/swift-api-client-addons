@@ -12,7 +12,7 @@ extension URLResponse {
 		return false
 	}
 
-	var http: HTTPURLResponse {
+	var http: HTTPURLResponse? {
 		if let response = self as? HTTPURLResponse {
 			return response
 		}
@@ -23,6 +23,6 @@ extension URLResponse {
 				httpVersion: nil,
 				headerFields: nil
 			)
-		} ?? HTTPURLResponse()
+		}
 	}
 }

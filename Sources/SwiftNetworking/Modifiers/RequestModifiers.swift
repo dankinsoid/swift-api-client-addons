@@ -157,9 +157,7 @@ public extension NetworkClient {
 	/// - Returns: An instance of `NetworkClient` with set query parameters.
 	func query(_ items: @escaping (Configs) throws -> [URLQueryItem]) -> NetworkClient {
 		modifyRequest { req, configs in
-			if #available(macOS 13.0, iOS 16.0, tvOS 16.0, watchOS 9.0, *) {
-				try req.url?.append(queryItems: items(configs))
-			} else if
+			if
 				let url = req.url,
 				var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
 			{
@@ -168,6 +166,8 @@ public extension NetworkClient {
 				}
 				try components.queryItems?.append(contentsOf: items(configs))
 				req.url = components.url ?? url
+			} else {
+				configs.logger.error("Invalid request: \(req)")
 			}
 		}
 	}
