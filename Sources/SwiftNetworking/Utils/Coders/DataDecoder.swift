@@ -22,26 +22,18 @@ public extension DataDecoder where Self == JSONDecoder {
 	///   - dataDecodingStrategy: Strategy for decoding data values. Default is `.deferredToData`.
 	///   - nonConformingFloatDecodingStrategy: Strategy for decoding non-conforming float values. Default is `.throw`.
 	///   - keyDecodingStrategy: Strategy for decoding keys. Default is `.useDefaultKeys`.
-	///   - allowsJSON5: A flag determining if JSON5 is allowed. Default is `false`. Available since macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0.
-	///   - assumesTopLevelDictionary: A flag determining if a top-level dictionary is assumed. Default is `false`. Available since macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0.
 	/// - Returns: An instance of `JSONDecoder` configured with the specified strategies.
 	static func json(
 		dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate,
 		dataDecodingStrategy: JSONDecoder.DataDecodingStrategy = .deferredToData,
 		nonConformingFloatDecodingStrategy: JSONDecoder.NonConformingFloatDecodingStrategy = .throw,
-		keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys,
-		allowsJSON5: Bool = false,
-		assumesTopLevelDictionary: Bool = false
+		keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys
 	) -> Self {
 		let decoder = JSONDecoder()
 		decoder.dataDecodingStrategy = dataDecodingStrategy
 		decoder.dateDecodingStrategy = dateDecodingStrategy
 		decoder.nonConformingFloatDecodingStrategy = nonConformingFloatDecodingStrategy
 		decoder.keyDecodingStrategy = keyDecodingStrategy
-		if #available(macOS 12.0, iOS 15.0, tvOS 15.0, watchOS 8.0, *) {
-			decoder.allowsJSON5 = allowsJSON5
-			decoder.assumesTopLevelDictionary = assumesTopLevelDictionary
-		}
 		return decoder
 	}
 }

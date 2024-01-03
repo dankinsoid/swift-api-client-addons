@@ -1,4 +1,7 @@
 import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 /// Defines a redirect behaviour.
 public enum RedirectorBehaviour {
