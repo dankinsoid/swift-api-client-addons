@@ -52,7 +52,6 @@ final class RequestModifiersTests: XCTestCase {
 
 	func testBodySetting() throws {
 		let modifiedClient = client.body(["name": "John"])
-
 		try XCTAssertEqual(modifiedClient.request().httpBody, try? JSONSerialization.data(withJSONObject: ["name": "John"]))
 		try XCTAssertEqual(modifiedClient.request().allHTTPHeaderFields?["Content-Type"], "application/json")
 	}
@@ -64,9 +63,9 @@ final class RequestModifiersTests: XCTestCase {
 	}
 
 	func testBaseURLSetting() throws {
-		let modifiedClient = client.baseURL(URL(string: "https://api.example.com")!)
+		let modifiedClient = client.query("test", "value").baseURL(URL(string: "http://test.net")!)
 
-		try XCTAssertEqual(modifiedClient.request().url?.absoluteString, "https://api.example.com")
+		try XCTAssertEqual(modifiedClient.request().url?.absoluteString, "http://test.net?test=value")
 	}
 
 	func testSchemeSetting() throws {

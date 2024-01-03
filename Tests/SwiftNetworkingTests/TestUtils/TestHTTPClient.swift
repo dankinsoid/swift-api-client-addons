@@ -26,19 +26,28 @@ private struct Unimplemented: Error {}
 extension NetworkClient {
 
 	func httpTest(
-		test: @escaping (URLRequest, NetworkClient.Configs) throws -> Void
+		test: @escaping (URLRequest, NetworkClient.Configs) throws -> Void = { _, _ in }
+	) async throws {
+		try await httpTest {
+			try test($0, $1)
+			return Data()
+		}
+	}
+
+	func httpTest(
+		test: @escaping (URLRequest, NetworkClient.Configs) throws -> Data
 	) async throws {
 		try await configs(\.testHTTPClient) {
-			try test($0, $1)
+			let data = try test($0, $1)
 			guard let response = HTTPURLResponse(
-				url: URL(string: "https://example.com")!,
+				url: $0.url ?? URL(string: "https://example.com")!,
 				statusCode: 200,
 				httpVersion: nil,
 				headerFields: nil
 			) else {
 				throw Unimplemented()
 			}
-			return (Data(), response)
+			return (data, response)
 		}
 		.call(.http, as: .void)
 	}

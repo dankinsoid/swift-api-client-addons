@@ -103,8 +103,16 @@ public extension NetworkClient {
 	/// Sets the request body with an `Encodable` value.
 	/// - Parameter value: The `Encodable` value to set as the body.
 	/// - Returns: An instance of `NetworkClient` with the serialized body.
-	func body(_ value: some Encodable) -> NetworkClient {
-		body(value, as: .encodable)
+	func body(_ value: any Encodable) -> NetworkClient {
+		body(AnyEncodable(value), as: .encodable)
+	}
+
+	/// Sets the request body with an `Encodable` value.
+	/// - Parameter dictionary: The dictionary of encodable values to set as the body.
+	/// - Returns: An instance of `NetworkClient` with the serialized body.
+	@_disfavoredOverload
+	func body(_ dictionary: [String: Encodable?]) -> NetworkClient {
+		body(dictionary.compactMapValues { $0.map { AnyEncodable($0) } }, as: .encodable)
 	}
 
 	/// Sets the request body with a JSON object.
