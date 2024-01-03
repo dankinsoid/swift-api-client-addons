@@ -1,5 +1,6 @@
 import Foundation
 import Starscream
+@_exported import SwiftNetworking
 import VDCodable
 
 /// A struct representing a WebSocket client for establishing WebSocket connections.
@@ -75,3 +76,23 @@ public extension NetworkClientCaller where Result == WebSocketChannel<Value>, Re
 		}
 	}
 }
+
+#if canImport(Combine)
+import Combine
+
+extension WebSocketChannel: Publisher {
+
+	public typealias Output = Element
+	public typealias Failure = Error
+
+	public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
+		Publishers.Task<Output, Failure> { send in
+			for try await output in self {
+				try Task.checkCancellation()
+				send(output)
+			}
+		}
+		.receive(subscriber: subscriber)
+	}
+}
+#endif

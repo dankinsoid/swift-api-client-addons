@@ -1,4 +1,5 @@
 import Foundation
+import SwiftNetworking
 
 /// A generic `AsyncSequence` for managing data communication over a WebSocket channel.
 public struct WebSocketChannel<Element>: AsyncSequence {

@@ -2,7 +2,7 @@
 import Combine
 import Foundation
 
-extension Publishers {
+public extension Publishers {
 
 	struct Task<Output, Failure: Error>: Publisher {
 
@@ -12,7 +12,7 @@ extension Publishers {
 			self.task = task
 		}
 
-		func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
+		public func receive<S: Subscriber>(subscriber: S) where Failure == S.Failure, Output == S.Input {
 			Publishers.Create<Output, Failure> { onOutput, onCompletion in
 				_Concurrency.Task {
 					await task {
@@ -36,7 +36,7 @@ extension Publishers {
 	}
 }
 
-extension Publishers.Task where Failure == Never {
+public extension Publishers.Task where Failure == Never {
 
 	init(_ task: @escaping () async -> Output) {
 		self.init { send in
@@ -53,7 +53,7 @@ extension Publishers.Task where Failure == Never {
 	}
 }
 
-extension Publishers.Task where Failure == Error {
+public extension Publishers.Task where Failure == Error {
 
 	init(_ task: @escaping ((Output) -> Void) async throws -> Void) {
 		self.init { send in

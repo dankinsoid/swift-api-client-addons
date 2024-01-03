@@ -1,17 +1,17 @@
 import Foundation
 
-struct AsyncSequenceOfElements<S: Sequence>: AsyncSequence {
+public struct AsyncSequenceOfElements<S: Sequence>: AsyncSequence {
 
-	typealias AsyncIterator = AsyncStream<S.Element>.AsyncIterator
-	typealias Element = S.Element
+	public typealias AsyncIterator = AsyncStream<S.Element>.AsyncIterator
+	public typealias Element = S.Element
 
 	let sequence: S
 
-	init(_ sequence: S) {
+	public init(_ sequence: S) {
 		self.sequence = sequence
 	}
 
-	func makeAsyncIterator() -> AsyncStream<S.Element>.AsyncIterator {
+	public func makeAsyncIterator() -> AsyncStream<S.Element>.AsyncIterator {
 		AsyncStream { cont in
 			for element in sequence {
 				cont.yield(element)
@@ -22,7 +22,7 @@ struct AsyncSequenceOfElements<S: Sequence>: AsyncSequence {
 	}
 }
 
-extension Sequence {
+public extension Sequence {
 
 	var async: AsyncSequenceOfElements<Self> {
 		AsyncSequenceOfElements(self)
