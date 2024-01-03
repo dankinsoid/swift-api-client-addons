@@ -1,6 +1,10 @@
-import SwiftNetworking
+import Foundation
+@testable import SwiftNetworking
 import VDCodable
 import XCTest
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 final class SwiftNetworkingTests: XCTestCase {
 
