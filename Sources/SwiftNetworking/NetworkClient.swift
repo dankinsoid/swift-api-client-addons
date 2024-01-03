@@ -15,9 +15,7 @@ public struct NetworkClient {
 	public init(
 		baseURL: URL
 	) {
-		_createRequest = { _ in
-			URLRequest(url: baseURL)
-		}
+		self.init(request: URLRequest(url: baseURL))
 	}
 
 	/// Initializes a new network client with a predefined URLRequest.

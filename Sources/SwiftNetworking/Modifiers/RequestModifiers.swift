@@ -161,7 +161,7 @@ public extension NetworkClient {
 				try req.url?.append(queryItems: items(configs))
 			} else if
 				let url = req.url,
-				var components = URLComponents(url: url, resolvingAgainstBaseURL: true)
+				var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
 			{
 				if components.queryItems == nil {
 					components.queryItems = []
@@ -214,12 +214,102 @@ public extension NetworkClient {
 
 public extension NetworkClient {
 
-	/// Sets the request timeoutInterval.
+	/// Sets the base URL for the request.
+	///
+	/// - Parameters:
+	///   - newBaseURL: The new base URL to set.
+	/// - Returns: An instance of `NetworkClient` with the updated base URL.
+	///
+	/// - Note: The path, query, and fragment of the original URL are retained, while those of the new URL are ignored.
+	func baseURL(_ newBaseURL: URL) -> NetworkClient {
+		modifyURLComponents { components in
+			components.scheme = newBaseURL.scheme
+			components.host = newBaseURL.host
+			components.port = newBaseURL.port
+		}
+	}
+
+	/// Sets the scheme for the request.
+	///
+	/// - Parameter scheme: The new scheme to set.
+	/// - Returns: An instance of `NetworkClient` with the updated scheme.
+	func scheme(_ scheme: String) -> NetworkClient {
+		modifyURLComponents { components in
+			components.scheme = scheme
+		}
+	}
+
+	/// Sets the host for the request.
+	///
+	/// - Parameter host: The new host to set.
+	/// - Returns: An instance of `NetworkClient` with the updated host.
+	func host(_ host: String) -> NetworkClient {
+		modifyURLComponents { components in
+			components.host = host
+		}
+	}
+
+	/// Sets the port for the request.
+	///
+	/// - Parameter port: The new port to set.
+	/// - Returns: An instance of `NetworkClient` with the updated port.
+	func port(_ port: Int?) -> NetworkClient {
+		modifyURLComponents { components in
+			components.port = port
+		}
+	}
+}
+
+public extension NetworkClient {
+
+	/// Modifies the URL components of the request.
+	///
+	/// - Parameter modifier: A closure that takes the current URL components and modifies them.
+	/// - Returns: An instance of `NetworkClient` with the modified URL components.
+	func modifyURLComponents(_ modifier: @escaping (inout URLComponents) throws -> Void) -> NetworkClient {
+		modifyRequest { req, configs in
+			guard let url = req.url else {
+				configs.logger.error("Failed to get URL of request")
+				return
+			}
+
+			guard var components = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+				configs.logger.error("Failed to get components of \(url.absoluteString)")
+				return
+			}
+
+			try modifier(&components)
+
+			guard let newURL = components.url else {
+				configs.logger.error("Failed to get URL from components")
+				return
+			}
+
+			req.url = newURL
+		}
+	}
+}
+
+public extension NetworkClient {
+
+	/// Sets the URLRequest timeoutInterval property.
 	/// - Parameter timeout: The timeout interval to set for the request.
 	/// - Returns: An instance of `NetworkClient` with the specified timeout interval.
 	func timeoutInterval(_ timeout: TimeInterval) -> NetworkClient {
 		modifyRequest {
 			$0.timeoutInterval = timeout
+		}
+	}
+}
+
+public extension NetworkClient {
+
+	/// Sets the URLRequest cachePolicy property.
+	/// - Parameter policy: The cache policy to set for the request.
+	/// - Returns: An instance of `NetworkClient` with the specified cache policy.
+	func cachePolicy(_ policy: URLRequest.CachePolicy) -> NetworkClient {
+		modifyRequest {
+			$0.cachePolicy = policy
 		}
 	}
 }
