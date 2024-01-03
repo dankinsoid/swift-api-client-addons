@@ -13,9 +13,14 @@ public extension NetworkClient.Configs {
 
 public extension NetworkClient {
 
-	/// Sets a custom error decoder for the network client.
+	/// Use this modifier when you want the client to throw an error that is decoded from the response.
 	/// - Parameter decoder: The `ErrorDecoder` to be used for decoding errors.
 	/// - Returns: An instance of `NetworkClient` configured with the specified error decoder.
+	///
+	/// Example usage:
+	/// ```swift
+	/// client.errorDecoder(.decodable(ErrorResponse.self))
+	/// ```
 	func errorDecoder(_ decoder: ErrorDecoder) -> NetworkClient {
 		configs(\.errorDecoder, decoder)
 	}
