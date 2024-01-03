@@ -1,3 +1,4 @@
+#if canImport(Reachability)
 import Foundation
 import Reachability
 
@@ -126,3 +127,4 @@ public extension ReachabilityService where Self == DefaultReachabilityService {
 		.shared
 	}
 }
+#endif

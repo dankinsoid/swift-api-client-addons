@@ -1,3 +1,4 @@
+#if canImport(Reachability)
 import Foundation
 import Reachability
 #if canImport(FoundationNetworking)
@@ -56,3 +57,4 @@ public extension NetworkClient {
 		}
 	}
 }
+#endif

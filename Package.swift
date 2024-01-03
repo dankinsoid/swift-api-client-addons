@@ -18,7 +18,6 @@ var package = Package(
 		.package(url: "https://github.com/dankinsoid/VDCodable.git", from: "2.14.0"),
 		.package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
 		.package(url: "https://github.com/dankinsoid/MultipartFormDataKit.git", from: "1.0.2"),
-		.package(url: "https://github.com/ashleymills/Reachability.swift", from: "5.1.0"),
 	],
 	targets: [
 		.target(
@@ -26,7 +25,6 @@ var package = Package(
 			dependencies: [
 				.product(name: "VDCodable", package: "VDCodable"),
 				.product(name: "Logging", package: "swift-log"),
-				.product(name: "Reachability", package: "Reachability.swift"),
 				.product(name: "MultipartFormDataKit", package: "MultipartFormDataKit"),
 			]
 		),
@@ -41,6 +39,12 @@ var package = Package(
 #else
 package.dependencies.append(
 	.package(url: "https://github.com/daltoniam/Starscream.git", from: "4.0.6")
+)
+package.dependencies.append(
+	.package(url: "https://github.com/ashleymills/Reachability.swift", from: "5.1.0")
+)
+package.targets[0].dependencies.append(
+	.product(name: "Reachability", package: "Reachability.swift")
 )
 package.targets.append(
 	.target(
