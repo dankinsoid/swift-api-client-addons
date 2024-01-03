@@ -30,7 +30,15 @@ extension NetworkClient {
 	) async throws {
 		try await configs(\.testHTTPClient) {
 			try test($0, $1)
-			return (Data(), HTTPURLResponse())
+			guard let response = HTTPURLResponse(
+				url: URL(string: "https://example.com")!,
+				statusCode: 200,
+				httpVersion: nil,
+				headerFields: nil
+			) else {
+				throw Unimplemented()
+			}
+			return (Data(), response)
 		}
 		.call(.http, as: .void)
 	}
