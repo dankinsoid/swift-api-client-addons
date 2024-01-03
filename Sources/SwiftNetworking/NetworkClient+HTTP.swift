@@ -38,38 +38,18 @@ public extension NetworkClient.Configs {
 	}
 }
 
-public extension NetworkClient {
+public extension NetworkClientCaller where Result == AsyncValue<Value>, Response == Data {
 
-	/// Performs an HTTP request and processes the response using the provided serializer and `HTTPClient` from configs.
-	/// - Parameters:
-	///   - serializer: A `Serializer` to process the response data.
-	/// - Throws: An error if the request fails, the response validation fails, or the response serialization fails.
-	/// - Returns: The serialized response data of type `T`.
-	func http<T>(
-		_ serializer: Serializer<Data, T>,
-		fileID: String = #fileID,
-		line: UInt = #line
-	) async throws -> T {
-		try await withRequest { request, configs in
-			do {
-				configs.logger.debug("Start a request \(request.description)")
-				try configs.requestValidator.validate(request, configs)
+	static var http: NetworkClientCaller {
+		NetworkClientCaller { request, configs, serialize in
+			{
 				let (data, response) = try await configs.httpClient.data(request, configs)
-				configs.logger.debug("Response")
-				do {
+				return try serialize(data) {
 					try configs.httpResponseValidator.validate(response, data, configs)
-					return try serializer.serialize(data, configs)
-				} catch {
-					if let failure = configs.errorDecoder.decodeError(data, configs) {
-						configs.logger.debug("Response failed with error: `\(error.humanReadable)`")
-						throw failure
-					}
-					throw error
 				}
-			} catch {
-				configs.logger.error("Request \(request.description) failed with error: `\(error.humanReadable)`")
-				throw error
 			}
+		} mockResult: { value in
+			{ value }
 		}
 	}
 }

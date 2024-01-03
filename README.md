@@ -32,19 +32,19 @@ struct Petstore {
   init(baseURL: BaseURL, token: String) {
     client = NetworkClient(baseURL: URL(string: baseURL.rawValue)!)
       .bodyDecoder(.json(dateDecodingStrategy: .iso8601, keyDecodingStrategy: .convertFromSnakeCase))
-      .authToken(token)
+      .auth(.bearer(token: token))
   }
 
   var pet: Pet {
-    Pet(client: client["pet"].auth(enabled: true))
+    Pet(client: client["pet"])
   }
 
   var store: Store {
-    Store(client: client["store"])
+    Store(client: client["store"].auth(enabled: false))
   }
 
   var user: User {
-    User(client: client["user"])
+    User(client: client["user"].auth(enabled: false))
   }
 
   struct Pet {
@@ -55,26 +55,26 @@ struct Petstore {
       try await client
         .method(.put)
         .body(pet)
-        .http(.decodable)
+        .call(.http, as: .decodable)
     }
 
     func add(_ pet: PetModel) async throws -> PetModel {
       try await client
         .method(.post)
         .body(pet)
-        .http(.decodable)
+        .call(.http, as: .decodable)
     }
 
     func findBy(status: PetStatus) async throws -> [PetModel] {
       try await client["findByStatus"]
         .query("status", status)
-        .http(.decodable)
+        .call(.http, as: .decodable)
     }
 
     func findBy(tags: [String]) async throws -> [PetModel] {
       try await client["findByTags"]
         .query("tags", tags)
-        .http(.decodable)
+        .call(.http, as: .decodable)
     }
 
     func callAsFunction(_ id: String) -> PetByID {
@@ -86,21 +86,20 @@ struct Petstore {
       var client: NetworkClient
 
       func get() async throws -> PetModel {
-        try await client
-          .http(.decodable)
+        try await client.call(.http, as: .decodable)
       }
 
       func update(name: String?, status: PetStatus?) async throws -> PetModel {
         try await client
           .method(.post)
           .query(["name": name, "status": status])
-          .http(.decodable)
+          .call(.http, as: .decodable)
       }
 
       func delete() async throws -> PetModel {
         try await client
           .method(.delete)
-          .http(.decodable)
+          .call(.http, as: .decodable)
       }
 
       func uploadImage(_ image: Data, additionalMetadata: String? = nil) async throws {
@@ -109,7 +108,7 @@ struct Petstore {
           .query("additionalMetadata", additionalMetadata)
           .body(image)
           .headers(.contentType(.application(.octetStream)))
-          .http(.void)
+          .call(.http, as: .void)
       }
     }
   }
@@ -121,14 +120,14 @@ struct Petstore {
     func inventory() async throws -> [String: Int] {
       try await client["inventory"]
         .auth(enabled: true)
-        .http(.decodable)
+        .call(.http, as: .decodable)
     }
 
     func order(_ model: OrderModel) async throws -> OrderModel {
       try await client["order"]
         .body(model)
         .method(.post)
-        .http(.decodable)
+        .call(.http, as: .decodable)
     }
 
     func callAsFunction(_ id: String) -> Order {
@@ -140,14 +139,13 @@ struct Petstore {
       var client: NetworkClient
 
       func find() async throws -> OrderModel {
-        try await client
-          .http(.decodable)
+        try await client.call(.http, as: .decodable)
       }
 
       func delete() async throws -> OrderModel {
         try await client
           .method(.delete)
-          .http(.decodable)
+          .call(.http, as: .decodable)
       }
     }
   }
@@ -160,24 +158,24 @@ struct Petstore {
       try await client
         .method(.post)
         .body(model)
-        .http(.decodable)
+        .call(.http, as: .decodable)
     }
 
     func createWith(list: [UserModel]) async throws {
       try await client["createWithList"]
         .method(.post)
         .body(list)
-        .http(.void)
+        .call(.http, as: .void)
     }
 
     func login(username: String, password: String) async throws -> String {
       try await client["login"]
         .query(LoginQuery(username: username, password: password))
-        .http(.decodable)
+        .call(.http, as: .decodable)
     }
 
     func logout() async throws {
-      try await client["logout"].http(.void)
+      try await client["logout"].call(.http, as: .void)
     }
 
     func callAsFunction(_ username: String) -> UserByUsername {
@@ -190,53 +188,22 @@ struct Petstore {
 
       func get() async throws -> UserModel {
         try await client
-          .http(.decodable)
+          .call(.http, as: .decodable)
       }
 
       func update(_ model: UserModel) async throws -> UserModel {
         try await client
           .method(.put)
           .body(model)
-          .http(.decodable)
+          .call(.http, as: .decodable)
       }
 
       func delete() async throws -> UserModel {
         try await client
           .method(.delete)
-          .http(.decodable)
+          .call(.http, as: .decodable)
       }
     }
-  }
-}
-
-// MARK: - Custom authentication methods
-
-extension NetworkClient.Configs {
-
-  var authToken: String {
-    get { self[\.authToken] ?? "" }
-    set { self[\.authToken] = newValue }
-  }
-
-  var isAuthEnabled: Bool {
-    get { self[\.isAuthEnabled] ?? false }
-    set { self[\.isAuthEnabled] = newValue }
-  }
-}
-
-extension NetworkClient {
-
-  func authToken(_ token: String) -> NetworkClient {
-    configs(\.authToken, token)
-      .modifyRequest { req, configs in
-        if configs.isAuthEnabled {
-          req.headers.add(.authorization(bearerToken: configs.authToken))
-        }
-      }
-  }
-
-  func auth(enabled: Bool) -> NetworkClient {
-    configs(\.isAuthEnabled, enabled)
   }
 }
 

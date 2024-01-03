@@ -211,3 +211,15 @@ public extension NetworkClient {
 		query([field: value])
 	}
 }
+
+public extension NetworkClient {
+
+	/// Sets the request timeoutInterval.
+	/// - Parameter timeout: The timeout interval to set for the request.
+	/// - Returns: An instance of `NetworkClient` with the specified timeout interval.
+	func timeoutInterval(_ timeout: TimeInterval) -> NetworkClient {
+		modifyRequest {
+			$0.timeoutInterval = timeout
+		}
+	}
+}

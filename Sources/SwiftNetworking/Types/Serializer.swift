@@ -21,6 +21,13 @@ public struct Serializer<Response, T> {
 	}
 }
 
+public extension Serializer where Response == T {
+
+	static var identity: Self {
+		Self { response, _ in response }
+	}
+}
+
 public extension Serializer where Response == Data, T == Data {
 
 	/// A static property to get a `Serializer` that directly returns the response `Data`.

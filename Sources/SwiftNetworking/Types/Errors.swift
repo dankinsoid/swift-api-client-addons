@@ -6,6 +6,7 @@ enum Errors: LocalizedError {
 	case invalidStatusCode(Int)
 	case notConnected
 	case invalidUTF8Data
+	case mockIsMissed(Any.Type)
 
 	var errorDescription: String? {
 		switch self {
@@ -17,6 +18,8 @@ enum Errors: LocalizedError {
 			return "Not connected to the internet"
 		case .invalidUTF8Data:
 			return "Invalid UTF8 data"
+		case let .mockIsMissed(type):
+			return "Mock for \(type) is missed"
 		}
 	}
 }

@@ -36,42 +36,6 @@ public extension NetworkClient.Configs {
 	}
 }
 
-public extension NetworkClient {
-
-	/// Establishes a WebSocket connection and returns a `WebSocketChannel` for data communication.
-	/// - Parameters:
-	///   - serializer: A `Serializer` to process the response data.
-	/// - Throws: An error if the connection fails or the request validation fails.
-	/// - Returns: A `WebSocketChannel` for the serialized response data of type `T`.
-	func webSocket<T>(
-		_ serializer: Serializer<Data, T>,
-		fileID: String = #fileID,
-		line: UInt = #line
-	) throws -> WebSocketChannel<T> {
-		try withRequest { request, configs in
-			do {
-				try configs.requestValidator.validate(request, configs)
-				configs.logger.debug("Start a stream \(request.description)")
-				return try configs.webSocketClient.connect(request, configs).map {
-					do {
-						return try serializer.serialize($0, configs)
-					} catch {
-						if let failure = configs.errorDecoder.decodeError($0, configs) {
-							configs.logger.debug("Response failed with error: `\(error.humanReadable)`")
-							throw failure
-						}
-						configs.logger.error("Response decoding failed with error: `\(error.humanReadable)`")
-						throw error
-					}
-				}
-			} catch {
-				configs.logger.error("Socket \(request.description) failed with error: `\(error.humanReadable)`")
-				throw error
-			}
-		}
-	}
-}
-
 public extension WebSocketClient {
 
 	/// A convenient static property to access the default WebSocket client.
@@ -93,6 +57,21 @@ public extension WebSocketClient {
 				pingInterval: pingInterval
 			)
 			return WebSocketChannel(stream, sendData: stream.send, sendString: stream.send)
+		}
+	}
+}
+
+public extension NetworkClientCaller where Result == WebSocketChannel<Value>, Response == Data {
+
+	static var webSocket: NetworkClientCaller {
+		NetworkClientCaller { request, configs, serialize in
+			try configs.webSocketClient.connect(request, configs).map {
+				try serialize($0) {}
+			}
+		} mockResult: { value in
+			WebSocketChannel([value].async) { _ in
+			} sendString: { _ in
+			}
 		}
 	}
 }

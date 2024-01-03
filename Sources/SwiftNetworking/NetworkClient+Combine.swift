@@ -2,18 +2,15 @@
 import Combine
 import Foundation
 
-public extension NetworkClient {
+public extension NetworkClientCaller where Result == AnyPublisher<Value, Error>, Response == Data {
 
-	/// Creates a publisher that performs a http network request and decodes the response body.
-	func httpPublisher<T>(
-		_ serializer: Serializer<Data, T>,
-		fileID: String = #fileID,
-		line: UInt = #line
-	) -> AnyPublisher<T, Error> {
-		Publishers.Task<T, Error> {
-			try await http(serializer, fileID: fileID, line: line)
+	static var httpPublisher: NetworkClientCaller {
+		NetworkClientCaller<Response, Value, AsyncValue<Value>>.http.map { value in
+			Publishers.Task {
+				try await value()
+			}
+			.eraseToAnyPublisher()
 		}
-		.eraseToAnyPublisher()
 	}
 }
 
