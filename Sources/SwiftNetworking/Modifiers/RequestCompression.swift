@@ -34,11 +34,11 @@ public extension NetworkClient {
 				return
 			}
 
-			let contentEncodingKey = "Content-Encoding"
+			let contentEncodingKey = HTTPHeader.Key.contentEncoding.rawValue
 			if urlRequest.value(forHTTPHeaderField: contentEncodingKey) != nil {
 				switch duplicateHeaderBehavior {
 				case .error:
-					throw DuplicateHeaderError()
+					throw Errors.duplicateHeader(.contentEncoding)
 				case .replace:
 					// Header will be replaced once the body data is compressed.
 					break
@@ -67,10 +67,6 @@ private func adler32Checksum(of data: Data) -> UInt32 {
 		UInt32(adler32(1, buffer.baseAddress, UInt32(buffer.count)))
 	}
 }
-
-/// `Error` produced when the outgoing `URLRequest` already has a `Content-Encoding` header, when the instance has
-/// been configured to produce an error.
-struct DuplicateHeaderError: Error {}
 
 /// Type that determines the action taken when the `URLRequest` already has a `Content-Encoding` header.
 public enum DuplicateHeaderBehavior {

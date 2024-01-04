@@ -8,6 +8,7 @@ import FoundationNetworking
 public struct NetworkClient {
 
 	private var _createRequest: (Configs) throws -> URLRequest
+	private var _modifyRequest: (inout URLRequest, Configs) throws -> Void = { _, _ in }
 	private var modifyConfigs: (inout Configs) -> Void = { _ in }
 
 	/// Initializes a new network client with a base URL for requests.
@@ -52,23 +53,40 @@ public struct NetworkClient {
 	}
 
 	/// Modifies the URLRequest using the provided closure.
-	/// - Parameter modifier: A closure that takes `inout URLRequest` and modifies it.
+	///   - order: The order of modifications.
+	///   - modifier: A closure that takes `inout URLRequest` and modifies the URLRequest.
 	/// - Returns: An instance of `NetworkClient` with a modified URLRequest.
-	public func modifyRequest(_ modifier: @escaping (inout URLRequest) throws -> Void) -> NetworkClient {
-		modifyRequest { req, _ in
+	public func modifyRequest(
+		order: RequestModifyingOrder = .append,
+		_ modifier: @escaping (inout URLRequest) throws -> Void
+	) -> NetworkClient {
+		modifyRequest(order: order) { req, _ in
 			try modifier(&req)
 		}
 	}
 
 	/// Modifies the URLRequest using the provided closure, with access to current configurations.
-	/// - Parameter modifier: A closure that takes `inout URLRequest` and `Configs`, and modifies the URLRequest.
+	/// - Parameter:
+	///   - order: The order of modifications.
+	///   - modifier: A closure that takes `inout URLRequest` and `Configs`, and modifies the URLRequest.
 	/// - Returns: An instance of `NetworkClient` with a modified URLRequest.
-	public func modifyRequest(_ modifier: @escaping (inout URLRequest, Configs) throws -> Void) -> NetworkClient {
+	public func modifyRequest(
+		order: RequestModifyingOrder = .append,
+		_ modifier: @escaping (inout URLRequest, Configs) throws -> Void
+	) -> NetworkClient {
 		var result = self
-		result._createRequest = { [_createRequest] configs in
-			var request = try _createRequest(configs)
-			try modifier(&request, configs)
-			return request
+		switch order {
+		case .append:
+			result._modifyRequest = { [_modifyRequest] request, configs in
+				try _modifyRequest(&request, configs)
+				try modifier(&request, configs)
+			}
+		case .prepend:
+			result._createRequest = { [_createRequest] configs in
+				var request = try _createRequest(configs)
+				try _modifyRequest(&request, configs)
+				return request
+			}
 		}
 		return result
 	}
@@ -115,7 +133,9 @@ public struct NetworkClient {
 		var configs = Configs()
 		modifyConfigs(&configs)
 		do {
-			return try (_createRequest(configs), configs)
+			var request = try _createRequest(configs)
+			try _modifyRequest(&request, configs)
+			return (request, configs)
 		} catch {
 			configs.logger.error("Request creation failed with error: `\(error.humanReadable)`")
 			throw error

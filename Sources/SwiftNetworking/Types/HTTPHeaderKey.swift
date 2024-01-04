@@ -13,6 +13,8 @@ public extension HTTPHeader {
 		public static let authorization: HTTPHeader.Key = "Authorization"
 		/// `Accept`
 		public static let accept: HTTPHeader.Key = "Accept"
+		/// `Accept-Encoding`
+		public static let acceptEncoding: HTTPHeader.Key = "Accept-Encoding"
 		/// `Accept-Language`
 		public static let acceptLanguage: HTTPHeader.Key = "Accept-Language"
 		/// `Accept-Charset`
@@ -79,6 +81,8 @@ public extension HTTPHeader {
 		public static let contentIdentifier: HTTPHeader.Key = "Content-Identifier"
 		/// `Content-Language`
 		public static let contentLanguage: HTTPHeader.Key = "Content-Language"
+		/// `Content-Encoding`
+		public static let contentEncoding: HTTPHeader.Key = "Content-Encoding"
 		/// `Content-Location`
 		public static let contentLocation: HTTPHeader.Key = "Content-Location"
 		/// `Content-MD5`

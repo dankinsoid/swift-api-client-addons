@@ -8,6 +8,7 @@ enum Errors: LocalizedError {
 	case mockIsMissed(Any.Type)
 	case unimplemented
 	case responseTypeIsNotHTTP
+	case duplicateHeader(HTTPHeader.Key)
 
 	var errorDescription: String? {
 		switch self {
@@ -23,6 +24,8 @@ enum Errors: LocalizedError {
 			return "Unimplemented"
 		case .responseTypeIsNotHTTP:
 			return "Response type is not HTTP"
+		case let .duplicateHeader(key):
+			return "Duplicate header \(key)"
 		}
 	}
 }
