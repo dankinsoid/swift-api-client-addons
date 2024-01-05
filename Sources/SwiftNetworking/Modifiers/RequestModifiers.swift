@@ -25,7 +25,7 @@ public extension NetworkClient {
 	/// - Parameter components: An array of components that conform to `CustomStringConvertible`.
 	/// - Returns: An instance of `NetworkClient` with updated path.
 	func path(_ components: [any CustomStringConvertible]) -> NetworkClient {
-		modifyRequest(order: .prepend) {
+		modifyRequest(when: .preparing) {
 			for component in components {
 				$0.url?.appendPathComponent(component.description)
 			}
@@ -39,7 +39,7 @@ public extension NetworkClient {
 	/// - Parameter method: The `HTTPMethod` to set for the request.
 	/// - Returns: An instance of `NetworkClient` with the specified HTTP method.
 	func method(_ method: HTTPMethod) -> NetworkClient {
-		modifyRequest(order: .prepend) {
+		modifyRequest(when: .preparing) {
 			$0.method = method
 		}
 	}
@@ -53,7 +53,7 @@ public extension NetworkClient {
 	///   - update: A Boolean to determine whether to update existing headers. Default is `false`.
 	/// - Returns: An instance of `NetworkClient` with modified headers.
 	func headers(_ headers: HTTPHeader..., update: Bool = false) -> NetworkClient {
-		modifyRequest(order: .prepend) {
+		modifyRequest(when: .preparing) {
 			for header in headers {
 				if update {
 					$0.setValue(header.value, forHTTPHeaderField: header.name.rawValue)
@@ -68,7 +68,7 @@ public extension NetworkClient {
 	/// - Parameter field: The key of the header to remove.
 	/// - Returns: An instance of `NetworkClient` with the specified header removed.
 	func removeHeader(_ field: HTTPHeader.Key) -> NetworkClient {
-		modifyRequest(order: .prepend) {
+		modifyRequest(when: .preparing) {
 			$0.setValue(nil, forHTTPHeaderField: field.rawValue)
 		}
 	}
@@ -92,7 +92,7 @@ public extension NetworkClient {
 	///   - serializer: The `ContentSerializer` used to serialize the body value.
 	/// - Returns: An instance of `NetworkClient` with the serialized body.
 	func body<T>(_ value: T, as serializer: ContentSerializer<T>) -> NetworkClient {
-		modifyRequest(order: .prepend) { req, configs in
+		modifyRequest(when: .preparing) { req, configs in
 			let (data, contentType) = try serializer.serialize(value, configs)
 			req.httpBodyStream = nil
 			req.httpBody = data
@@ -133,7 +133,7 @@ public extension NetworkClient {
 	/// - Parameter data: A closure taking `Configs` and returning `Data` to be set as the body.
 	/// - Returns: An instance of `NetworkClient` with the specified body.
 	func body(_ data: @escaping (Configs) throws -> Data) -> NetworkClient {
-		modifyRequest(order: .prepend) { req, configs in
+		modifyRequest(when: .preparing) { req, configs in
 			req.httpBodyStream = nil
 			req.httpBody = try data(configs)
 		}
@@ -164,7 +164,7 @@ public extension NetworkClient {
 	/// - Parameter items: A closure taking `Configs` and returning an array of `URLQueryItem`.
 	/// - Returns: An instance of `NetworkClient` with set query parameters.
 	func query(_ items: @escaping (Configs) throws -> [URLQueryItem]) -> NetworkClient {
-		modifyRequest(order: .prepend) { req, configs in
+		modifyRequest(when: .preparing) { req, configs in
 			if
 				let url = req.url,
 				var components = URLComponents(url: url, resolvingAgainstBaseURL: false)
@@ -275,7 +275,7 @@ public extension NetworkClient {
 	/// - Parameter modifier: A closure that takes the current URL components and modifies them.
 	/// - Returns: An instance of `NetworkClient` with the modified URL components.
 	func modifyURLComponents(_ modifier: @escaping (inout URLComponents) throws -> Void) -> NetworkClient {
-		modifyRequest(order: .prepend) { req, configs in
+		modifyRequest(when: .preparing) { req, configs in
 			guard let url = req.url else {
 				configs.logger.error("Failed to get URL of request")
 				return
@@ -304,7 +304,7 @@ public extension NetworkClient {
 	/// - Parameter timeout: The timeout interval to set for the request.
 	/// - Returns: An instance of `NetworkClient` with the specified timeout interval.
 	func timeoutInterval(_ timeout: TimeInterval) -> NetworkClient {
-		modifyRequest(order: .prepend) {
+		modifyRequest(when: .preparing) {
 			$0.timeoutInterval = timeout
 		}
 	}
@@ -316,7 +316,7 @@ public extension NetworkClient {
 	/// - Parameter policy: The cache policy to set for the request.
 	/// - Returns: An instance of `NetworkClient` with the specified cache policy.
 	func cachePolicy(_ policy: URLRequest.CachePolicy) -> NetworkClient {
-		modifyRequest(order: .prepend) {
+		modifyRequest(when: .preparing) {
 			$0.cachePolicy = policy
 		}
 	}

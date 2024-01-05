@@ -53,35 +53,35 @@ public struct NetworkClient {
 	}
 
 	/// Modifies the URLRequest using the provided closure.
-	///   - order: The order of modifications.
+	///   - location: When the request should be modified.
 	///   - modifier: A closure that takes `inout URLRequest` and modifies the URLRequest.
 	/// - Returns: An instance of `NetworkClient` with a modified URLRequest.
 	public func modifyRequest(
-		order: RequestModifyingOrder = .append,
+		when location: RequestModifyingLocation = .ready,
 		_ modifier: @escaping (inout URLRequest) throws -> Void
 	) -> NetworkClient {
-		modifyRequest(order: order) { req, _ in
+		modifyRequest(when: location) { req, _ in
 			try modifier(&req)
 		}
 	}
 
 	/// Modifies the URLRequest using the provided closure, with access to current configurations.
 	/// - Parameter:
-	///   - order: The order of modifications.
+	///   - location: When the request should be modified.
 	///   - modifier: A closure that takes `inout URLRequest` and `Configs`, and modifies the URLRequest.
 	/// - Returns: An instance of `NetworkClient` with a modified URLRequest.
 	public func modifyRequest(
-		order: RequestModifyingOrder = .append,
+		when location: RequestModifyingLocation = .ready,
 		_ modifier: @escaping (inout URLRequest, Configs) throws -> Void
 	) -> NetworkClient {
 		var result = self
-		switch order {
-		case .append:
+		switch location {
+		case .ready:
 			result._modifyRequest = { [_modifyRequest] request, configs in
 				try _modifyRequest(&request, configs)
 				try modifier(&request, configs)
 			}
-		case .prepend:
+		case .preparing:
 			result._createRequest = { [_createRequest] configs in
 				var request = try _createRequest(configs)
 				try _modifyRequest(&request, configs)
