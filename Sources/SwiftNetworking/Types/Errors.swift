@@ -9,6 +9,7 @@ enum Errors: LocalizedError {
 	case unimplemented
 	case responseTypeIsNotHTTP
 	case duplicateHeader(HTTPHeader.Key)
+	case invalidFileURL(URL)
 
 	var errorDescription: String? {
 		switch self {
@@ -26,6 +27,8 @@ enum Errors: LocalizedError {
 			return "Response type is not HTTP"
 		case let .duplicateHeader(key):
 			return "Duplicate header \(key)"
+		case let .invalidFileURL(url):
+			return "Invalid file URL \(url)"
 		}
 	}
 }

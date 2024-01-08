@@ -25,29 +25,14 @@ public extension RequestValidator {
 	}
 }
 
-public extension NetworkClient.Configs {
-
-	/// The request validator used for validating `URLRequest` instances.
-	/// Gets the currently set `RequestValidator`, or `.alwaysSuccess` if not set.
-	/// Sets a new `RequestValidator`.
-	var requestValidator: RequestValidator {
-		get { self[\.requestValidator] ?? .alwaysSuccess }
-		set { self[\.requestValidator] = newValue }
-	}
-}
-
 public extension NetworkClient {
 
 	/// Sets a custom request validator for the network client.
 	/// - Parameter validator: The `RequestValidator` to be used for validating `URLRequest` instances.
 	/// - Returns: An instance of `NetworkClient` configured with the specified request validator.
 	func requestValidator(_ validator: RequestValidator) -> NetworkClient {
-		configs {
-			let old = $0.requestValidator.validate
-			$0.requestValidator = RequestValidator {
-				try old($0, $1)
-				try validator.validate($0, $1)
-			}
+		beforeCall {
+			try validator.validate($0, $1)
 		}
 	}
 }

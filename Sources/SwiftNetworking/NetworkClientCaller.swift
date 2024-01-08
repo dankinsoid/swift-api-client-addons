@@ -120,10 +120,12 @@ public extension NetworkClient {
 		try withRequest { request, configs in
 			do {
 				configs.logger.debug("Start a request \(request.description)")
-				try configs.requestValidator.validate(request, configs)
+				var request = request
+				try configs.beforeCall(&request, configs)
 				if let mock = try configs.getMockIfNeeded(for: Value.self, serializer: serializer) {
 					return try caller.mockResult(for: mock)
 				}
+
 				return try caller.call(request: request, configs: configs) { response, validate in
 					configs.logger.debug("Response")
 					do {
@@ -142,5 +144,28 @@ public extension NetworkClient {
 				throw error
 			}
 		}
+	}
+
+	/// Sets a closure to be executed before making a network call.
+	///
+	/// - Parameters:
+	///   - closure: The closure to be executed before making a network call. It takes in an `inout URLRequest` and `NetworkClient.Configs` as parameters and can modify the request.
+	/// - Returns: The `NetworkClient` instance.
+	func beforeCall(_ closure: @escaping (inout URLRequest, NetworkClient.Configs) throws -> Void) -> NetworkClient {
+		configs {
+			let beforeCall = $0.beforeCall
+			$0.beforeCall = { request, configs in
+				try beforeCall(&request, configs)
+				try closure(&request, configs)
+			}
+		}
+	}
+}
+
+public extension NetworkClient.Configs {
+
+	var beforeCall: (inout URLRequest, NetworkClient.Configs) throws -> Void {
+		get { self[\.beforeCall] ?? { _, _ in } }
+		set { self[\.beforeCall] = newValue }
 	}
 }

@@ -43,6 +43,13 @@ public extension NetworkClientCaller where Result == AsyncValue<Value>, Response
 	static var http: NetworkClientCaller {
 		NetworkClientCaller { request, configs, serialize in
 			{
+				var request = request
+				if request.httpMethod == nil {
+					request.httpMethod = HTTPMethod.get.rawValue
+				}
+				if request.httpBodyStream != nil {
+					configs.logger.error("HTTPBodyStream is not supported with a http caller. Use httpUpload instead.")
+				}
 				let (data, response) = try await configs.httpClient.data(request, configs)
 				return try serialize(data) {
 					try configs.httpResponseValidator.validate(response, data, configs)

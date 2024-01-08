@@ -24,7 +24,7 @@ public extension NetworkClient {
 		duplicateHeaderBehavior: DuplicateHeaderBehavior = .skip,
 		shouldCompressBodyData: @escaping (_ bodyData: Data) -> Bool = { _ in true }
 	) -> NetworkClient {
-		modifyRequest { urlRequest, _ in
+		beforeCall { urlRequest, _ in
 			// No need to compress unless we have body data. No support for compressing streams.
 			guard let bodyData = urlRequest.httpBody else {
 				return

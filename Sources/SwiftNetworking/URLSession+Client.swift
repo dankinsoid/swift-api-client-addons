@@ -12,7 +12,9 @@ public extension HTTPClient {
 	static func urlSession(_ session: URLSession) -> Self {
 		HTTPClient { request, _ in
 			#if os(Linux)
-			return try await asyncMethod(with: request, session.dataTask)
+			return try await asyncMethod { completion in
+				session.dataTask(with: request, completionHandler: completion)
+			}
 			#else
 			if #available(macOS 12.0, iOS 15.0, watchOS 8.0, tvOS 15.0, *) {
 				let (data, response) = try await session.data(for: request)
@@ -21,7 +23,9 @@ public extension HTTPClient {
 				}
 				return (data, httpResponse)
 			} else {
-				return try await asyncMethod(with: request, session.dataTask)
+				return try await asyncMethod { completion in
+					session.dataTask(with: request, completionHandler: completion)
+				}
 			}
 			#endif
 		}
@@ -33,21 +37,56 @@ public extension HTTPClient {
 	}
 }
 
+public extension HTTPUploadClient {
+
+	static func urlSession(_ session: URLSession) -> Self {
+		HTTPUploadClient { request, uploadTask, _ in
+		  try await asyncMethod { completion in		
+				session.uploadTask(with: request, task: uploadTask, completionHandler: completion)
+			}
+		}
+	}
+
+	static var urlSession: Self {
+		urlSession(.shared)
+	}
+}
+
+private extension URLSession {
+
+	func uploadTask(with request: URLRequest, task: UploadTask, completionHandler: @escaping @Sendable (Data?, URLResponse?, Error?) -> Void) -> URLSessionUploadTask {
+		switch task {
+			case let .data(data):
+				return uploadTask(with: request, from: data, completionHandler: completionHandler)
+			case let .file(url):
+				return uploadTask(with: request, fromFile: url, completionHandler: completionHandler)
+			case .stream:
+			return uploadTask(withStreamedRequest: request)
+		}
+	}
+}
+
 private func asyncMethod<T, S: URLSessionTask>(
-	with urlRequest: URLRequest,
 	_ method: @escaping (
-		URLRequest, @escaping @Sendable (T?, URLResponse?, Error?) -> Void
+		@escaping @Sendable (T?, URLResponse?, Error?) -> Void
 	) -> S
 ) async throws -> (T, HTTPURLResponse) {
-	try await withCheckedThrowingContinuation { continuation in
-		method(urlRequest) { t, response, error in
+	try await completionToThrowsAsync { continuation, handler in
+		let task = method { t, response, error in
 			if let t, let response = response?.http {
 				continuation.resume(returning: (t, response))
 			} else {
-				continuation.resume(throwing: error ?? Errors.unknown)
+				if (error as? NSError)?.code == NSURLErrorCancelled {
+					continuation.resume(throwing: CancellationError())
+				} else {
+					continuation.resume(throwing: error ?? Errors.unknown)
+				}
 			}
 		}
-		.resume()
+		handler.onCancel {
+			task.cancel()
+		}
+		task.resume()
 	}
 }
 
