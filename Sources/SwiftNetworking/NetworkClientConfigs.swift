@@ -1,5 +1,8 @@
 import Foundation
 import Logging
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 public extension NetworkClient {
 
@@ -7,9 +10,19 @@ public extension NetworkClient {
 	struct Configs {
 
 		private var values: [PartialKeyPath<NetworkClient.Configs>: Any] = [:]
+		private let createRequest: (Configs) throws -> URLRequest
 
 		/// Initializes a new configuration set for `NetworkClient`.
-		public init() {}
+		public init(
+			createRequest: @escaping (Configs) throws -> URLRequest
+		) {
+			self.createRequest = createRequest
+		}
+
+		/// The network client used for network operations.
+		public var client: NetworkClient { 
+			NetworkClient(createRequest: createRequest).configs(\.self, self)
+		}
 
 		/// Provides subscript access to configuration values based on their key paths.
 		/// - Parameter keyPath: A `WritableKeyPath` to the configuration property.

@@ -20,7 +20,7 @@ public extension NetworkClient {
 	func auth(_ authModifier: AuthModifier) -> NetworkClient {
 		modifyRequest { request, configs in
 			if configs.isAuthEnabled {
-				try authModifier.modifier(&request)
+				try authModifier.modifier(&request, configs)
 			}
 		}
 	}
@@ -37,13 +37,21 @@ public extension NetworkClient {
 public struct AuthModifier {
 
 	/// A closure that modifies a `URLRequest` for authentication.
-	public let modifier: (inout URLRequest) throws -> Void
+    public let modifier: (inout URLRequest, NetworkClient.Configs) throws -> Void
 
 	/// Initializes a new `AuthModifier` with a custom modifier closure.
-	/// - Parameter modifier: A closure that modifies a `URLRequest` for authentication.
-	public init(modifier: @escaping (inout URLRequest) -> Void) {
+	/// - Parameter modifier: A closure that modifies a `URLRequest` and `NetworkClient.Configs` for authentication.
+	public init(modifier: @escaping (inout URLRequest, NetworkClient.Configs) throws -> Void) {
 		self.modifier = modifier
 	}
+
+    /// Initializes a new `AuthModifier` with a custom modifier closure.
+    /// - Parameter modifier: A closure that modifies a `URLRequest` for authentication.
+    public init(modifier: @escaping (inout URLRequest) throws -> Void) {
+        self.init { request, _ in
+            try modifier(&request)
+        }
+    }
 
 	/// Creates an authentication modifier for adding a `Authorization` header.
 	public static func header(_ value: String) -> AuthModifier {

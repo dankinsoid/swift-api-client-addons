@@ -10,6 +10,14 @@ public struct NetworkClient {
 	private var _createRequest: (Configs) throws -> URLRequest
 	private var modifyConfigs: (inout Configs) -> Void = { _ in }
 
+	/// Initializes a new network client with a closure that creates a URLRequest.
+	/// - Parameter createRequest: A closure that takes `Configs` and returns a `URLRequest`.
+	public init(
+		createRequest: @escaping (Configs) throws -> URLRequest
+	) {
+		_createRequest = createRequest
+	}
+
 	/// Initializes a new network client with a base URL for requests.
 	/// - Parameter baseURL: The base URL to be used for creating requests.
 	public init(
@@ -23,7 +31,7 @@ public struct NetworkClient {
 	public init(
 		request: URLRequest
 	) {
-		_createRequest = { _ in
+		self.init { _ in
 			request
 		}
 	}
@@ -103,7 +111,7 @@ public struct NetworkClient {
 	/// - Rethrows: Rethrows any errors encountered within the closure.
 	/// - Returns: The result of the closure of type `T`.
 	public func withConfigs<T>(_ operation: (Configs) throws -> T) rethrows -> T {
-		var configs = Configs()
+		var configs = Configs(createRequest: _createRequest)
 		modifyConfigs(&configs)
 		return try operation(configs)
 	}
@@ -113,13 +121,13 @@ public struct NetworkClient {
 	/// - Rethrows: Rethrows any errors encountered within the closure.
 	/// - Returns: The result of the closure of type `T`.
 	public func withConfigs<T>(_ operation: (Configs) async throws -> T) async rethrows -> T {
-		var configs = Configs()
+		var configs = Configs(createRequest: _createRequest)
 		modifyConfigs(&configs)
 		return try await operation(configs)
 	}
 
 	private func createRequest() throws -> (URLRequest, Configs) {
-		var configs = Configs()
+		var configs = Configs(createRequest: _createRequest)
 		modifyConfigs(&configs)
 		do {
 			return try (_createRequest(configs), configs)

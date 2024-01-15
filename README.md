@@ -3,16 +3,15 @@
 ## Overview
 Swift-Networking is a modern, comprehensive, and modular networking library for Swift. Designed with a focus on extensibility and reusability, it simplifies building and managing complex networking tasks in your Swift applications. The library supports a wide range of networking needs, from HTTP requests to WebSocket communication, and is easily testable and mockable.
 
-## Key Features
-- **Modular Design**: Build complex networking clients with reusable and interchangeable components.
-- **Comprehensive Configuration**: Extensive support for custom configurations, including headers, query parameters, and body content.
-- **WebSocket Support**: Integrated support for WebSocket connections.
-- **Async/Await Ready**: Leverages Swift's concurrency model for clear and concise asynchronous code.
-- **Error Handling**: Robust error handling and logging mechanisms.
-- **Testing and Mocking**: Facilitates easy testing with mock services and clients.
+Swift-networking focuses on extensibility and reusability of all configs. The root of the library is NetworkClient struct. The main idea is that you can create a client with a base URL and then create new clients from it, which will inherit all the settings of the parent client. For example, you can create a client for the API with the base URL "https://api.github.com" and then create a client for the API with the base URL "https://api.github.com/users" from it. The second client will inherit all the settings of the first client, but you can override them if necessary. 
+There is a list of all implemented configs.
+// TODO: finish
+Basically NetworkClient is a combination of two components: a closure to create a URLReauest and a dictionory of configs. So there is two ways to extend a NetworkClient.
+- Add a new config.
+- Add a new URLRequest modifier.
 
-## Installation
-[Instructions for installing and integrating the library in a Swift project]
+```swift
+
 
 ## Usage
 Below is an example of using Swift-Networking to create an API client for a [Petstore](https://petstore3.swagger.io):
@@ -244,7 +243,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.2.0")
+    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.3.0")
   ],
   targets: [
     .target(

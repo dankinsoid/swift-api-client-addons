@@ -11,14 +11,31 @@ protocol TokenCacheService {
 extension NetworkClient {
     
     func beaerAuth(_ service: TokenCacheService) -> NetworkClient {
-        auth(
-            AuthModifier { request in
-                guard let token = service.getToken() else {
-                    throw NoToken()
+        // It's not required to create a .tokenCacheService config in this case, but it allows to override the token cache service and use it in other services, for instance, in a token refresher.
+        configs(\.tokenCacheService, service)
+            .auth(
+                AuthModifier { request, configs in
+                    guard let token = configs.tokenCacheService.getToken() else {
+                        throw NoToken()
+                    }
+                    request.setHeader(.authorization(bearerToken: token))
                 }
-                request.setHeader(.authorization(bearerToken: token))
-            }
-        )
+            )
+    }
+}
+
+extension NetworkClient.Configs {
+    
+    var tokenCacheService: TokenCacheService {
+        get {
+            self[\.tokenCacheService] ?? valueFor(
+                live: UserDefaultsTokenCacheService() as TokenCacheService,
+                test: MockTokenCacheService()
+            )
+        }
+        set {
+            self[\.tokenCacheService] = newValue
+        }
     }
 }
 

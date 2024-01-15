@@ -389,11 +389,20 @@ extension Collection<String> {
 // MARK: - System Type Extensions
 
 public extension URLRequest {
+
 	/// Returns `allHTTPHeaderFields` as `HTTPHeaders`.
 	var headers: HTTPHeaders {
 		get { allHTTPHeaderFields.map(HTTPHeaders.init) ?? HTTPHeaders() }
 		set { allHTTPHeaderFields = newValue.dictionary }
 	}
+
+    mutating func setHeader(_ header: HTTPHeader) {
+        setValue(header.value, forHTTPHeaderField: header.name.rawValue)
+    }
+
+    func value(forHTTPHeaderKey key: HTTPHeader.Key) -> String? {
+        value(forHTTPHeaderField: key.rawValue)
+    }
 }
 
 public extension HTTPURLResponse {
