@@ -41,7 +41,7 @@ public extension HTTPClient {
 
 // 	static func urlSession(_ session: URLSession) -> Self {
 // 		HTTPUploadClient { request, uploadTask, _ in
-// 		  try await asyncMethod { completion in		
+// 		  try await asyncMethod { completion in
 // 				session.uploadTask(with: request, task: uploadTask, completionHandler: completion)
 // 			}
 // 		}

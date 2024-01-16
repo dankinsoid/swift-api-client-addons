@@ -1,9 +1,3 @@
-// import Foundation
-// import VDCodable
-// #if canImport(FoundationNetworking)
-// import FoundationNetworking
-// #endif
-
 // /// A struct representing an HTTP client capable of performing network requests.
 // public struct HTTPUploadClient {
 

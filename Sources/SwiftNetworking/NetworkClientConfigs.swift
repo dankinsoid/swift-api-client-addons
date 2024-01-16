@@ -20,7 +20,7 @@ public extension NetworkClient {
 		}
 
 		/// The network client used for network operations.
-		public var client: NetworkClient { 
+		public var client: NetworkClient {
 			NetworkClient(createRequest: createRequest).configs(\.self, self)
 		}
 

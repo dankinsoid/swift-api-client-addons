@@ -32,4 +32,3 @@ extension NetworkClient.Configs {
 		set { self[\.testValue] = newValue }
 	}
 }
-

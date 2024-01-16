@@ -396,13 +396,13 @@ public extension URLRequest {
 		set { allHTTPHeaderFields = newValue.dictionary }
 	}
 
-    mutating func setHeader(_ header: HTTPHeader) {
-        setValue(header.value, forHTTPHeaderField: header.name.rawValue)
-    }
+	mutating func setHeader(_ header: HTTPHeader) {
+		setValue(header.value, forHTTPHeaderField: header.name.rawValue)
+	}
 
-    func value(forHTTPHeaderKey key: HTTPHeader.Key) -> String? {
-        value(forHTTPHeaderField: key.rawValue)
-    }
+	func value(forHTTPHeaderKey key: HTTPHeader.Key) -> String? {
+		value(forHTTPHeaderField: key.rawValue)
+	}
 }
 
 public extension HTTPURLResponse {

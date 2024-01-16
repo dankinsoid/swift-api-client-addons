@@ -14,43 +14,43 @@ public extension NetworkClient {
 		wasInBackgroundService: @autoclosure @escaping () -> WasInBackgroundService
 	) -> NetworkClient {
 		configs {
-            let base = $0.httpClient
-            $0.httpClient = HTTPClient { request, configs in
-                var count = 0
-                let didEnterBackground = wasInBackgroundService()
+			let base = $0.httpClient
+			$0.httpClient = HTTPClient { request, configs in
+				var count = 0
+				let didEnterBackground = wasInBackgroundService()
 
-                func needRetry() -> Bool {
-                    guard didEnterBackground.wasInBackground else {
-                        return false
-                    }
-                    if let retryLimit {
-                        return count <= retryLimit
-                    }
-                    return true
-                }
-                
-                func retry() async throws -> (Data, HTTPURLResponse) {
-                    count += 1
-                    didEnterBackground.reset()
-                    didEnterBackground.start()
-                    return try await base.data(request, configs)
-                }
-                
-                let response: HTTPURLResponse
-                let data: Data
-                do {
-                    (data, response) = try await retry()
-                } catch {
-                    if needRetry() {
-                        return try await retry()
-                    }
-                    throw error
-                }
-                if !response.isStatusCodeValid, needRetry() {
-                    return try await retry()
-                }
-                return (data, response)
-            }
+				func needRetry() -> Bool {
+					guard didEnterBackground.wasInBackground else {
+						return false
+					}
+					if let retryLimit {
+						return count <= retryLimit
+					}
+					return true
+				}
+
+				func retry() async throws -> (Data, HTTPURLResponse) {
+					count += 1
+					didEnterBackground.reset()
+					didEnterBackground.start()
+					return try await base.data(request, configs)
+				}
+
+				let response: HTTPURLResponse
+				let data: Data
+				do {
+					(data, response) = try await retry()
+				} catch {
+					if needRetry() {
+						return try await retry()
+					}
+					throw error
+				}
+				if !response.isStatusCodeValid, needRetry() {
+					return try await retry()
+				}
+				return (data, response)
+			}
 		}
 	}
 }
