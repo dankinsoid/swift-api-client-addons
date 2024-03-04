@@ -1,11 +1,11 @@
 import Foundation
 import SwiftNetworking
 
-struct Petstore {
+public struct Petstore {
 
 	// MARK: - BaseURL
 
-	enum BaseURL: String {
+	public enum BaseURL: String {
 
 		case production = "https://petstore.com"
 		case staging = "https://staging.petstore.com"
@@ -14,8 +14,9 @@ struct Petstore {
 
 	var client: NetworkClient
 
-	init(baseURL: BaseURL) {
+	public init(baseURL: BaseURL, fileID: String, line: UInt) {
 		client = NetworkClient(baseURL: URL(string: baseURL.rawValue)!)
+			.fileIDLine(fileID: fileID, line: line)
 			.bodyDecoder(.json(dateDecodingStrategy: .iso8601, keyDecodingStrategy: .convertFromSnakeCase))
 			.beaerAuth(
 				valueFor(
@@ -27,81 +28,67 @@ struct Petstore {
 				valueFor(
 					live: APITokenRefresher($0),
 					test: MockTokenRefresher()
-				)
+				) as TokenRefresher
 			}
 	}
 }
 
 // MARK: - "pet" path
 
-extension Petstore {
+public extension Petstore {
 
 	var pet: Pet {
-		Pet(client: client["pet"])
+		Pet(client: client("pet"))
 	}
 
 	struct Pet {
 
 		var client: NetworkClient
 
-		func update(_ pet: PetModel) async throws -> PetModel {
-			try await client
-				.method(.put)
-				.body(pet)
-				.call(.http, as: .decodable)
+		public func update(_ pet: PetModel) async throws -> PetModel {
+			try await client.body(pet).put()
 		}
 
-		func add(_ pet: PetModel) async throws -> PetModel {
-			try await client
-				.method(.post)
-				.body(pet)
-				.call(.http, as: .decodable)
+		public func add(_ pet: PetModel) async throws -> PetModel {
+			try await client.body(pet).post()
 		}
 
-		func findBy(status: PetStatus) async throws -> [PetModel] {
-			try await client["findByStatus"]
-				.query("status", status)
-				.call(.http, as: .decodable)
+		public func findBy(status: PetStatus) async throws -> [PetModel] {
+			try await client("findByStatus").query("status", status).call()
 		}
 
-		func findBy(tags: [String]) async throws -> [PetModel] {
-			try await client["findByTags"]
-				.query("tags", tags)
-				.call(.http, as: .decodable)
+		public func findBy(tags: [String]) async throws -> [PetModel] {
+			try await client("findByTags").query("tags", tags).call()
 		}
 
-		func callAsFunction(_ id: String) -> PetByID {
+		public func callAsFunction(_ id: String) -> PetByID {
 			PetByID(client: client.path(id))
 		}
 
-		struct PetByID {
+		public struct PetByID {
 
 			var client: NetworkClient
 
-			func get() async throws -> PetModel {
-				try await client.call(.http, as: .decodable)
+			public func get() async throws -> PetModel {
+				try await client()
 			}
 
-			func update(name: String?, status: PetStatus?) async throws -> PetModel {
+			public func update(name: String?, status: PetStatus?) async throws -> PetModel {
 				try await client
-					.method(.post)
 					.query(["name": name, "status": status])
-					.call(.http, as: .decodable)
+					.post()
 			}
 
-			func delete() async throws -> PetModel {
-				try await client
-					.method(.delete)
-					.call(.http, as: .decodable)
+			public func delete() async throws -> PetModel {
+				try await client.delete()
 			}
 
-			func uploadImage(_ image: Data, additionalMetadata: String? = nil) async throws {
-				try await client["uploadImage"]
-					.method(.post)
+			public func uploadImage(_ image: Data, additionalMetadata: String? = nil) async throws {
+				try await client("uploadImage")
 					.query("additionalMetadata", additionalMetadata)
 					.body(image)
 					.headers(.contentType(.application(.octetStream)))
-					.call(.http, as: .void)
+					.post()
 			}
 		}
 	}
@@ -109,45 +96,38 @@ extension Petstore {
 
 // MARK: - "store" path
 
-extension Petstore {
+public extension Petstore {
 
 	var store: Store {
-		Store(client: client["store"].auth(enabled: false))
+		Store(client: client("store").auth(enabled: false))
 	}
 
 	struct Store {
 
 		var client: NetworkClient
 
-		func inventory() async throws -> [String: Int] {
-			try await client["inventory"]
-				.auth(enabled: true)
-				.call(.http, as: .decodable)
+		public func inventory() async throws -> [String: Int] {
+			try await client("inventory").auth(enabled: true).call()
 		}
 
-		func order(_ model: OrderModel) async throws -> OrderModel {
-			try await client["order"]
-				.body(model)
-				.method(.post)
-				.call(.http, as: .decodable)
+		public func order(_ model: OrderModel) async throws -> OrderModel {
+			try await client("order").body(model).post()
 		}
 
-		func callAsFunction(_ id: String) -> Order {
+		public func order(_ id: String) -> Order {
 			Order(client: client.path("order", id))
 		}
 
-		struct Order {
+		public struct Order {
 
 			var client: NetworkClient
 
-			func find() async throws -> OrderModel {
-				try await client.call(.http, as: .decodable)
+			public func find() async throws -> OrderModel {
+				try await client()
 			}
 
-			func delete() async throws -> OrderModel {
-				try await client
-					.method(.delete)
-					.call(.http, as: .decodable)
+			public func delete() async throws -> OrderModel {
+				try await client.delete()
 			}
 		}
 	}
@@ -155,63 +135,52 @@ extension Petstore {
 
 // MARK: "user" path
 
-extension Petstore {
+public extension Petstore {
 
 	var user: User {
-		User(client: client["user"].auth(enabled: false))
+		User(client: client("user").auth(enabled: false))
 	}
 
 	struct User {
 
 		var client: NetworkClient
 
-		func create(_ model: UserModel) async throws -> UserModel {
-			try await client
-				.method(.post)
-				.body(model)
-				.call(.http, as: .decodable)
+		public func create(_ model: UserModel) async throws -> UserModel {
+			try await client.body(model).post()
 		}
 
-		func createWith(list: [UserModel]) async throws {
-			try await client["createWithList"]
-				.method(.post)
-				.body(list)
-				.call(.http, as: .void)
+		public func createWith(list: [UserModel]) async throws {
+			try await client("createWithList").body(list).post()
 		}
 
-		func login(username: String, password: String) async throws -> String {
-			try await client["login"]
+		public func login(username: String, password: String) async throws -> String {
+			try await client("login")
 				.query(LoginQuery(username: username, password: password))
-				.call(.http, as: .decodable)
+				.call()
 		}
 
-		func logout() async throws {
-			try await client["logout"].call(.http, as: .void)
+		public func logout() async throws {
+			try await client("logout").call()
 		}
 
-		func callAsFunction(_ username: String) -> UserByUsername {
+		public func callAsFunction(_ username: String) -> UserByUsername {
 			UserByUsername(client: client.path(username))
 		}
 
-		struct UserByUsername {
+		public struct UserByUsername {
 
 			var client: NetworkClient
 
-			func get() async throws -> UserModel {
-				try await client.call(.http, as: .decodable)
+			public func get() async throws -> UserModel {
+				try await client()
 			}
 
-			func update(_ model: UserModel) async throws -> UserModel {
-				try await client
-					.method(.put)
-					.body(model)
-					.call(.http, as: .decodable)
+			public func update(_ model: UserModel) async throws -> UserModel {
+				try await client.body(model).put()
 			}
 
-			func delete() async throws -> UserModel {
-				try await client
-					.method(.delete)
-					.call(.http, as: .decodable)
+			public func delete() async throws -> UserModel {
+				try await client.delete()
 			}
 		}
 	}

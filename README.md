@@ -35,15 +35,15 @@ struct Petstore {
   }
 
   var pet: Pet {
-    Pet(client: client["pet"])
+    Pet(client: client("pet"))
   }
 
   var store: Store {
-    Store(client: client["store"].auth(enabled: false))
+    Store(client: client("store").auth(enabled: false))
   }
 
   var user: User {
-    User(client: client["user"].auth(enabled: false))
+    User(client: client("user").auth(enabled: false))
   }
 
   struct Pet {
@@ -52,36 +52,34 @@ struct Petstore {
 
     /// PUT /pet
     func update(_ pet: PetModel) async throws -> PetModel {
-      try await client
-        .method(.put)
+      try await client.put
         .body(pet)
         .call(.http, as: .decodable)
     }
 
     /// POST /pet
     func add(_ pet: PetModel) async throws -> PetModel {
-      try await client
-        .method(.post)
+      try await client.post
         .body(pet)
-        .call(.http, as: .decodable)
+        .call() // .http and .decodable are default values, so can be missed.
     }
 
     /// GET /pet/findByStatus
     func findBy(status: PetStatus) async throws -> [PetModel] {
-      try await client["findByStatus"]
+      try await client("findByStatus")
         .query("status", status)
-        .call(.http, as: .decodable)
+        .get() // GET method is the default method, so it's equivalent to .call()
     }
 
     /// GET /pet/findByTags
     func findBy(tags: [String]) async throws -> [PetModel] {
-      try await client["findByTags"]
+      try await client("findByTags")
         .query("tags", tags)
-        .call(.http, as: .decodable)
+        .get()
     }
 
     func callAsFunction(_ id: String) -> PetByID {
-      PetByID(client: client.path(id))
+      PetByID(client: client(id))
     }
 
     struct PetByID {
@@ -90,28 +88,24 @@ struct Petstore {
 
       /// GET /pet/{id}
       func get() async throws -> PetModel {
-        try await client.call(.http, as: .decodable)
+        try await client()
       }
 
       /// POST /pet/{id}
       func update(name: String?, status: PetStatus?) async throws -> PetModel {
-        try await client
-          .method(.post)
+        try await client.post
           .query(["name": name, "status": status])
-          .call(.http, as: .decodable)
+          .get()
       }
 
       /// DELETE /pet/{id}
       func delete() async throws -> PetModel {
-        try await client
-          .method(.delete)
-          .call(.http, as: .decodable)
+        try await client.delete()
       }
 
       /// POST /pet/{id}/uploadImage
       func uploadImage(_ image: Data, additionalMetadata: String? = nil) async throws {
-        try await client["uploadImage"]
-          .method(.post)
+        try await client.post("uploadImage")
           .query("additionalMetadata", additionalMetadata)
           .body(image)
           .headers(.contentType(.application(.octetStream)))
@@ -126,21 +120,16 @@ struct Petstore {
 
     /// GET /store/inventory
     func inventory() async throws -> [String: Int] {
-      try await client["inventory"]
-        .auth(enabled: true)
-        .call(.http, as: .decodable)
+      try await client("inventory").call()
     }
 
     /// POST /store/order
     func order(_ model: OrderModel) async throws -> OrderModel {
-      try await client["order"]
-        .body(model)
-        .method(.post)
-        .call(.http, as: .decodable)
+      try await client.post("order").body(model).call()
     }
 
     func callAsFunction(_ id: String) -> Order {
-      Order(client: client.path("order", id))
+      Order(client: client("order", id))
     }
 
     struct Order {
@@ -149,14 +138,12 @@ struct Petstore {
 
       /// GET /store/order/{id}
       func find() async throws -> OrderModel {
-        try await client.call(.http, as: .decodable)
+        try await client()
       }
 
       /// DELETE /store/order/{id}
       func delete() async throws -> OrderModel {
-        try await client
-          .method(.delete)
-          .call(.http, as: .decodable)
+        try await client.delete()
       }
     }
   }
@@ -167,34 +154,30 @@ struct Petstore {
 
     /// POST /user
     func create(_ model: UserModel) async throws -> UserModel {
-      try await client
-        .method(.post)
-        .body(model)
-        .call(.http, as: .decodable)
+      try await client.body(model).post()
     }
 
     /// POST /user/createWithList
     func createWith(list: [UserModel]) async throws {
-      try await client["createWithList"]
-        .method(.post)
+      try await client.post("createWithList")
         .body(list)
         .call(.http, as: .void)
     }
 
     /// GET /user/login
     func login(username: String, password: String) async throws -> String {
-      try await client["login"]
+      try await client("login")
         .query(LoginQuery(username: username, password: password))
-        .call(.http, as: .decodable)
+        .get()
     }
 
     /// GET /user/logout
     func logout() async throws {
-      try await client["logout"].call(.http, as: .void)
+      try await client("logout").get()
     }
 
     func callAsFunction(_ username: String) -> UserByUsername {
-      UserByUsername(client: client.path(username))
+      UserByUsername(client: client(username))
     }
 
     struct UserByUsername {
@@ -203,23 +186,17 @@ struct Petstore {
 
       /// GET /user/{name}
       func get() async throws -> UserModel {
-        try await client
-          .call(.http, as: .decodable)
+        try await client()
       }
 
       /// POST /user/{name}
       func update(_ model: UserModel) async throws -> UserModel {
-        try await client
-          .method(.put)
-          .body(model)
-          .call(.http, as: .decodable)
+        try await client.body(model).put()
       }
 
       /// DELETE /user/{name}
       func delete() async throws -> UserModel {
-        try await client
-          .method(.delete)
-          .call(.http, as: .decodable)
+        try await client.delete()
       }
     }
   }
@@ -262,7 +239,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.5.1")
+    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.6.0")
   ],
   targets: [
     .target(

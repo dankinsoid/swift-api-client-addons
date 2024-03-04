@@ -1,40 +1,40 @@
 import Foundation
 
-struct LoginQuery: Codable {
+public struct LoginQuery: Codable {
 
-	var username: String
-	var password: String
+	public var username: String
+	public var password: String
 }
 
-struct UserModel: Codable {
+public struct UserModel: Codable {
 
-	var id: Int
-	var username: String
-	var firstName: String
-	var lastName: String
-	var email: String
-	var password: String
-	var phone: String
-	var userStatus: Int
+	public var id: Int
+	public var username: String
+	public var firstName: String
+	public var lastName: String
+	public var email: String
+	public var password: String
+	public var phone: String
+	public var userStatus: Int
 }
 
-struct OrderModel: Codable {
+public struct OrderModel: Codable {
 
-	var id: Int
-	var petId: Int
-	var quantity: Int
-	var shipDate: Date
-	var complete: Bool
+	public var id: Int
+	public var petId: Int
+	public var quantity: Int
+	public var shipDate: Date
+	public var complete: Bool
 }
 
-struct PetModel: Codable {
+public struct PetModel: Codable {
 
-	var id: Int
-	var name: String
-	var tag: String?
+	public var id: Int
+	public var name: String
+	public var tag: String?
 }
 
-enum PetStatus: String, Codable {
+public enum PetStatus: String, Codable {
 
 	case available
 	case pending
