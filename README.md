@@ -19,16 +19,9 @@ Below is an example of using Swift-Networking to create an API client for a [Pet
 ```swift
 struct Petstore {
 
-  enum BaseURL: String {
-
-    case production = "https://petstore.com"
-    case staging = "https://staging.petstore.com"
-    case test = "http://localhost:8080"
-  }
-
   var client: NetworkClient
 
-  init(baseURL: BaseURL, token: String) {
+  init(baseURL: URL, token: String) {
     client = NetworkClient(baseURL: URL(string: baseURL.rawValue)!)
       .bodyDecoder(.json(dateDecodingStrategy: .iso8601, keyDecodingStrategy: .convertFromSnakeCase))
       .auth(.bearer(token: token))
@@ -40,10 +33,6 @@ struct Petstore {
 
   var store: Store {
     Store(client: client("store").auth(enabled: false))
-  }
-
-  var user: User {
-    User(client: client("user").auth(enabled: false))
   }
 
   struct Pet {
@@ -63,55 +52,6 @@ struct Petstore {
         .body(pet)
         .call() // .http and .decodable are default values, so can be missed.
     }
-
-    /// GET /pet/findByStatus
-    func findBy(status: PetStatus) async throws -> [PetModel] {
-      try await client("findByStatus")
-        .query("status", status)
-        .get() // GET method is the default method, so it's equivalent to .call()
-    }
-
-    /// GET /pet/findByTags
-    func findBy(tags: [String]) async throws -> [PetModel] {
-      try await client("findByTags")
-        .query("tags", tags)
-        .get()
-    }
-
-    func callAsFunction(_ id: String) -> PetByID {
-      PetByID(client: client(id))
-    }
-
-    struct PetByID {
-
-      var client: NetworkClient
-
-      /// GET /pet/{id}
-      func get() async throws -> PetModel {
-        try await client()
-      }
-
-      /// POST /pet/{id}
-      func update(name: String?, status: PetStatus?) async throws -> PetModel {
-        try await client.post
-          .query(["name": name, "status": status])
-          .get()
-      }
-
-      /// DELETE /pet/{id}
-      func delete() async throws -> PetModel {
-        try await client.delete()
-      }
-
-      /// POST /pet/{id}/uploadImage
-      func uploadImage(_ image: Data, additionalMetadata: String? = nil) async throws {
-        try await client.post("uploadImage")
-          .query("additionalMetadata", additionalMetadata)
-          .body(image)
-          .headers(.contentType(.application(.octetStream)))
-          .call(.http, as: .void)
-      }
-    }
   }
 
   struct Store {
@@ -127,78 +67,6 @@ struct Petstore {
     func order(_ model: OrderModel) async throws -> OrderModel {
       try await client.post("order").body(model).call()
     }
-
-    func callAsFunction(_ id: String) -> Order {
-      Order(client: client("order", id))
-    }
-
-    struct Order {
-
-      var client: NetworkClient
-
-      /// GET /store/order/{id}
-      func find() async throws -> OrderModel {
-        try await client()
-      }
-
-      /// DELETE /store/order/{id}
-      func delete() async throws -> OrderModel {
-        try await client.delete()
-      }
-    }
-  }
-
-  struct User {
-
-    var client: NetworkClient
-
-    /// POST /user
-    func create(_ model: UserModel) async throws -> UserModel {
-      try await client.body(model).post()
-    }
-
-    /// POST /user/createWithList
-    func createWith(list: [UserModel]) async throws {
-      try await client.post("createWithList")
-        .body(list)
-        .call(.http, as: .void)
-    }
-
-    /// GET /user/login
-    func login(username: String, password: String) async throws -> String {
-      try await client("login")
-        .query(LoginQuery(username: username, password: password))
-        .get()
-    }
-
-    /// GET /user/logout
-    func logout() async throws {
-      try await client("logout").get()
-    }
-
-    func callAsFunction(_ username: String) -> UserByUsername {
-      UserByUsername(client: client(username))
-    }
-
-    struct UserByUsername {
-
-      var client: NetworkClient
-
-      /// GET /user/{name}
-      func get() async throws -> UserModel {
-        try await client()
-      }
-
-      /// POST /user/{name}
-      func update(_ model: UserModel) async throws -> UserModel {
-        try await client.body(model).put()
-      }
-
-      /// DELETE /user/{name}
-      func delete() async throws -> UserModel {
-        try await client.delete()
-      }
-    }
   }
 }
 
@@ -206,12 +74,9 @@ struct Petstore {
 
 func exampleOfUsage() async throws {
     let api = Petstore(baseURL: .production, token: "token")
-
-    _ = try await api.pet("some-id").get()
-    _ = try await api.pet.findBy(status: .available)
+    // ...
+    _ = try await api.update(model)
     _ = try await api.store.inventory()
-    _ = try await api.user.logout()
-    _ = try await api.user("name").delete()
 }
 ```
 
@@ -239,7 +104,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.6.0")
+    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.7.0")
   ],
   targets: [
     .target(
