@@ -50,6 +50,7 @@ struct Petstore {
 
     var client: NetworkClient
 
+    /// PUT /pet
     func update(_ pet: PetModel) async throws -> PetModel {
       try await client
         .method(.put)
@@ -57,6 +58,7 @@ struct Petstore {
         .call(.http, as: .decodable)
     }
 
+    /// POST /pet
     func add(_ pet: PetModel) async throws -> PetModel {
       try await client
         .method(.post)
@@ -64,12 +66,14 @@ struct Petstore {
         .call(.http, as: .decodable)
     }
 
+    /// GET /pet/findByStatus
     func findBy(status: PetStatus) async throws -> [PetModel] {
       try await client["findByStatus"]
         .query("status", status)
         .call(.http, as: .decodable)
     }
 
+    /// GET /pet/findByTags
     func findBy(tags: [String]) async throws -> [PetModel] {
       try await client["findByTags"]
         .query("tags", tags)
@@ -84,10 +88,12 @@ struct Petstore {
 
       var client: NetworkClient
 
+      /// GET /pet/{id}
       func get() async throws -> PetModel {
         try await client.call(.http, as: .decodable)
       }
 
+      /// POST /pet/{id}
       func update(name: String?, status: PetStatus?) async throws -> PetModel {
         try await client
           .method(.post)
@@ -95,12 +101,14 @@ struct Petstore {
           .call(.http, as: .decodable)
       }
 
+      /// DELETE /pet/{id}
       func delete() async throws -> PetModel {
         try await client
           .method(.delete)
           .call(.http, as: .decodable)
       }
 
+      /// POST /pet/{id}/uploadImage
       func uploadImage(_ image: Data, additionalMetadata: String? = nil) async throws {
         try await client["uploadImage"]
           .method(.post)
@@ -116,12 +124,14 @@ struct Petstore {
 
     var client: NetworkClient
 
+    /// GET /store/inventory
     func inventory() async throws -> [String: Int] {
       try await client["inventory"]
         .auth(enabled: true)
         .call(.http, as: .decodable)
     }
 
+    /// POST /store/order
     func order(_ model: OrderModel) async throws -> OrderModel {
       try await client["order"]
         .body(model)
@@ -137,10 +147,12 @@ struct Petstore {
 
       var client: NetworkClient
 
+      /// GET /store/order/{id}
       func find() async throws -> OrderModel {
         try await client.call(.http, as: .decodable)
       }
 
+      /// DELETE /store/order/{id}
       func delete() async throws -> OrderModel {
         try await client
           .method(.delete)
@@ -153,6 +165,7 @@ struct Petstore {
 
     var client: NetworkClient
 
+    /// POST /user
     func create(_ model: UserModel) async throws -> UserModel {
       try await client
         .method(.post)
@@ -160,6 +173,7 @@ struct Petstore {
         .call(.http, as: .decodable)
     }
 
+    /// POST /user/createWithList
     func createWith(list: [UserModel]) async throws {
       try await client["createWithList"]
         .method(.post)
@@ -167,12 +181,14 @@ struct Petstore {
         .call(.http, as: .void)
     }
 
+    /// GET /user/login
     func login(username: String, password: String) async throws -> String {
       try await client["login"]
         .query(LoginQuery(username: username, password: password))
         .call(.http, as: .decodable)
     }
 
+    /// GET /user/logout
     func logout() async throws {
       try await client["logout"].call(.http, as: .void)
     }
@@ -185,11 +201,13 @@ struct Petstore {
 
       var client: NetworkClient
 
+      /// GET /user/{name}
       func get() async throws -> UserModel {
         try await client
           .call(.http, as: .decodable)
       }
 
+      /// POST /user/{name}
       func update(_ model: UserModel) async throws -> UserModel {
         try await client
           .method(.put)
@@ -197,6 +215,7 @@ struct Petstore {
           .call(.http, as: .decodable)
       }
 
+      /// DELETE /user/{name}
       func delete() async throws -> UserModel {
         try await client
           .method(.delete)
@@ -243,7 +262,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.5.0")
+    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.5.1")
   ],
   targets: [
     .target(
