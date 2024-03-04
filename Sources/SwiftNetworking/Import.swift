@@ -1,2 +1,2 @@
-@_exported import SwiftNetworkingCore
 @_exported import SwiftJSON
+@_exported import SwiftNetworkingCore

@@ -5,5 +5,4 @@ import XCTest
 import FoundationNetworking
 #endif
 
-final class NetworkClientTests: XCTestCase {
-}
+final class NetworkClientTests: XCTestCase {}

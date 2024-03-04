@@ -23,7 +23,7 @@ struct Petstore {
 					test: MockTokenCacheService()
 				)
 			)
-			.tokenRefresher { 
+			.tokenRefresher {
 				valueFor(
 					live: APITokenRefresher($0),
 					test: MockTokenRefresher()

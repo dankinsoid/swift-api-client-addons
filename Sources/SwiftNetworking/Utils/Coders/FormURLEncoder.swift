@@ -1,6 +1,6 @@
-//import Foundation
+// import Foundation
 //
-//public extension ContentEncoder where Self == FormURLEncoder {
+// public extension ContentEncoder where Self == FormURLEncoder {
 //
 //	/// A static property to get a `FormURLEncoder` instance with default encoding strategies.
 //	static var formURL: Self { .formURL() }
@@ -28,10 +28,10 @@
 //			trimmingSquareBrackets: trimmingSquareBrackets
 //		)
 //	}
-//}
+// }
 //
 ///// A `ContentEncoder` for encoding objects into `x-www-form-urlencoded` format.
-//public struct FormURLEncoder: ContentEncoder {
+// public struct FormURLEncoder: ContentEncoder {
 //
 //	private var urlEncoder: URLQueryEncoder
 //
@@ -71,4 +71,4 @@
 //		guard let data = try urlEncoder.encodePath(value).data(using: .utf8) else { throw Errors.unknown }
 //		return data
 //	}
-//}
+// }

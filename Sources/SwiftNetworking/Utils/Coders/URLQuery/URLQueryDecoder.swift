@@ -1,18 +1,18 @@
-//import Foundation
+// import Foundation
 //
-//public struct URLQueryDecoder {
+// public struct URLQueryDecoder {
 //
 //    public typealias Input = URL
 //    public var dateDecodingStrategy: DateCodingStrategy
 //    public var arrayDecodingStrategy: ArrayDecodingStrategy
 //    public var keyDecodingStrategy: KeyDecodingStrategy
-//    
+//
 //    public init(keyDecodingStrategy: KeyDecodingStrategy = .useDefaultKeys, dateDecodingStrategy: DateCodingStrategy = .unixTimeSeconds, arrayDecodingStrategy: ArrayDecodingStrategy = .commaSeparator) {
 //        self.keyDecodingStrategy = keyDecodingStrategy
 //        self.dateDecodingStrategy = dateDecodingStrategy
 //        self.arrayDecodingStrategy = arrayDecodingStrategy
 //    }
-//    
+//
 //    public func decode<T: Decodable>(_ type: T.Type, from data: URL) throws -> T {
 //        let unboxer = try Unboxer(data, keyDecodingStrategy: keyDecodingStrategy, dateDecodingStrategy: dateDecodingStrategy, arrayDecodingStrategy: arrayDecodingStrategy)
 //        return try T(from: VDDecoder(unboxer: unboxer))
@@ -24,7 +24,7 @@
 //        case customSeparator(String)
 //        case custom((_ path: [CodingKey], _ string: String) throws -> [String])
 //    }
-//    
+//
 //    public enum DateCodingStrategy {
 //        case unixTimeSeconds
 //        case unixTimeMilliseconds
@@ -33,20 +33,20 @@
 //        case custom(([CodingKey], Date) throws -> String)
 //        case iso8601
 //    }
-//    
-//}
 //
-//fileprivate struct Unboxer: DecodingUnboxer {
+// }
+//
+// fileprivate struct Unboxer: DecodingUnboxer {
 //    let input: QueryValue
 //    let codingPath: [CodingKey]
 //    let keyDecodingStrategy: KeyDecodingStrategy
 //    let dateDecodingStrategy: URLQueryDecoder.DateCodingStrategy
 //    let arrayDecodingStrategy: URLQueryDecoder.ArrayDecodingStrategy
-//    
+//
 //    func decodeNil() -> Bool {
 //        return false
 //    }
-//    
+//
 //    init(_ input: QueryValue, keyDecodingStrategy: KeyDecodingStrategy, dateDecodingStrategy: URLQueryDecoder.DateCodingStrategy, arrayDecodingStrategy: URLQueryDecoder.ArrayDecodingStrategy) throws {
 //        self.input = input
 //        self.codingPath = []
@@ -54,7 +54,7 @@
 //        self.dateDecodingStrategy = dateDecodingStrategy
 //        self.arrayDecodingStrategy = arrayDecodingStrategy
 //    }
-//    
+//
 //    init(_ url: URL, keyDecodingStrategy: KeyDecodingStrategy, dateDecodingStrategy: URLQueryDecoder.DateCodingStrategy, arrayDecodingStrategy: URLQueryDecoder.ArrayDecodingStrategy) throws {
 //        let components = try URLComponents(url: url, resolvingAgainstBaseURL: false)~!
 //        let items = components.queryItems ?? []
@@ -66,7 +66,7 @@
 //        }
 //        self = try Unboxer(query, keyDecodingStrategy: keyDecodingStrategy, dateDecodingStrategy: dateDecodingStrategy, arrayDecodingStrategy: arrayDecodingStrategy)
 //    }
-//    
+//
 //    init(input: QueryValue, path: [CodingKey], other unboxer: Unboxer) {
 //        self.input = input
 //        self.codingPath = path
@@ -74,14 +74,14 @@
 //        dateDecodingStrategy = unboxer.dateDecodingStrategy
 //        arrayDecodingStrategy = unboxer.arrayDecodingStrategy
 //    }
-//    
+//
 //    private func getString() throws -> String {
 //        guard case .single(let result) = input else {
 //            throw DecodingError.dataCorrupted(DecodingError.Context(codingPath: codingPath, debugDescription: "Cannot get single value for \(input.array ?? [])"))
 //        }
 //        return result
 //    }
-//    
+//
 //    func decodeArray() throws -> [QueryValue] {
 //        switch arrayDecodingStrategy {
 //        case .commaSeparator:
@@ -99,7 +99,7 @@
 //            return try block(codingPath, string).map({ .single($0) })
 //        }
 //    }
-//    
+//
 //    func decodeDictionary() throws -> [String: QueryValue] {
 //        let array = try input.array~!
 //        guard !array.isEmpty else { return [:] }
@@ -124,7 +124,7 @@
 //        }
 //        return result
 //    }
-//    
+//
 //    func decode(_ type: Bool.Type) throws -> Bool {
 //        let string = try getString()
 //        switch string.lowercased() {
@@ -136,11 +136,11 @@
 //            throw error(type, string)
 //        }
 //    }
-//    
+//
 //    func decode(_ type: String.Type) throws -> String {
 //        return try getString()
 //    }
-//    
+//
 //    func decode(_ type: Double.Type) throws -> Double {
 //        let string = try getString()
 //        if let double = Double(string) {
@@ -148,7 +148,7 @@
 //        }
 //        throw error(type, string)
 //    }
-//    
+//
 //    func decode(_ type: Int.Type) throws -> Int {
 //        let string = try getString()
 //        if let double = Int(string) {
@@ -156,15 +156,15 @@
 //        }
 //        throw error(type, string)
 //    }
-//    
+//
 //    @inline(__always)
 //    private func error<T>(_ type: T.Type, _ string: String) -> DecodingError {
 //        return DecodingError.dataCorrupted(DecodingError.Context(codingPath: codingPath, debugDescription: "Expected \(type), but found \(string)"))
 //    }
-//    
+//
 //    func decode<T: Decodable>(_ type: T.Type) throws -> T {
 //        let decoder = VDDecoder(unboxer: self)
 //        return try T(from: decoder)
 //    }
-//    
-//}
+//
+// }

@@ -19,7 +19,7 @@ public extension ContentEncoder where Self == MultipartFormDataEncoder {
 public struct MultipartFormDataEncoder: ContentEncoder {
 
 	/// The content type associated with this encoder, which is `multipart/form-data`.
-    public var contentType: SwiftNetworkingCore.ContentType {
+	public var contentType: SwiftNetworkingCore.ContentType {
 		.multipart(.formData)
 	}
 
