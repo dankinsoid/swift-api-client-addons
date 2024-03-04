@@ -62,7 +62,7 @@ struct Petstore {
 
     /// POST /store/order
     func order(_ model: OrderModel) async throws -> OrderModel {
-      try await client.post("order").body(model).call()
+      try await client("order").body(model).post()
     }
   }
 }
