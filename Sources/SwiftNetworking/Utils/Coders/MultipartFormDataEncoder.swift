@@ -1,6 +1,5 @@
 import Foundation
 import MultipartFormDataKit
-import VDCodable
 
 public extension ContentEncoder where Self == MultipartFormDataEncoder {
 
@@ -20,7 +19,7 @@ public extension ContentEncoder where Self == MultipartFormDataEncoder {
 public struct MultipartFormDataEncoder: ContentEncoder {
 
 	/// The content type associated with this encoder, which is `multipart/form-data`.
-	public var contentType: ContentType {
+    public var contentType: SwiftNetworkingCore.ContentType {
 		.multipart(.formData)
 	}
 

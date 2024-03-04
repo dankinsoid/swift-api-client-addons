@@ -15,16 +15,16 @@ var package = Package(
 		.library(name: "SwiftNetworking", targets: ["SwiftNetworking"]),
 	],
 	dependencies: [
-		.package(url: "https://github.com/dankinsoid/VDCodable.git", from: "2.14.0"),
-		.package(url: "https://github.com/apple/swift-log.git", from: "1.5.3"),
+        .package(url: "https://github.com/dankinsoid/swift-networking-core.git", from: "0.1.0"),
+        .package(url: "https://github.com/dankinsoid/swift-json.git", from: "0.1.0"),
 		.package(url: "https://github.com/dankinsoid/MultipartFormDataKit.git", from: "1.0.2"),
 	],
 	targets: [
 		.target(
 			name: "SwiftNetworking",
 			dependencies: [
-				.product(name: "VDCodable", package: "VDCodable"),
-				.product(name: "Logging", package: "swift-log"),
+                .product(name: "SwiftNetworkingCore", package: "swift-networking-core"),
+                .product(name: "SwiftJSON", package: "swift-json"),
 				.product(name: "MultipartFormDataKit", package: "MultipartFormDataKit"),
 			]
 		),

@@ -1,7 +1,6 @@
 import Foundation
 import Starscream
 @_exported import SwiftNetworking
-import VDCodable
 
 /// A struct representing a WebSocket client for establishing WebSocket connections.
 public struct WebSocketClient {

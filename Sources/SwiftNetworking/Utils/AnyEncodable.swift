@@ -1,14 +1,14 @@
 import Foundation
 
-struct AnyEncodable: Encodable {
-
-	var value: Encodable
-
-	init(_ value: Encodable) {
-		self.value = value
-	}
-
-	func encode(to encoder: Encoder) throws {
-		try value.encode(to: encoder)
-	}
+public struct AnyEncodable: Encodable {
+    
+    public var base: Encodable
+    
+    public init(_ base: Encodable) {
+        self.base = base
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        try base.encode(to: encoder)
+    }
 }
