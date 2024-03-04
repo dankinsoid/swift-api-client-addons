@@ -10,9 +10,6 @@ Basically NetworkClient is a combination of two components: a closure to create 
 - Add a new config.
 - Add a new URLRequest modifier.
 
-```swift
-
-
 ## Usage
 Below is an example of using Swift-Networking to create an API client for a [Petstore](https://petstore3.swagger.io):
 
