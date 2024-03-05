@@ -19,7 +19,7 @@ struct Petstore {
   var client: NetworkClient
 
   init(baseURL: URL, token: String) {
-    client = NetworkClient(baseURL: URL(string: baseURL.rawValue)!)
+    client = NetworkClient(baseURL: URL(string: baseURL)!)
       .bodyDecoder(.json(dateDecodingStrategy: .iso8601, keyDecodingStrategy: .convertFromSnakeCase))
       .auth(.bearer(token: token))
   }
