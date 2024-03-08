@@ -10,9 +10,6 @@ Basically NetworkClient is a combination of two components: a closure to create 
 - Add a new config.
 - Add a new URLRequest modifier.
 
-```swift
-
-
 ## Usage
 Below is an example of using Swift-Networking to create an API client for a [Petstore](https://petstore3.swagger.io):
 
@@ -22,7 +19,7 @@ struct Petstore {
   var client: NetworkClient
 
   init(baseURL: URL, token: String) {
-    client = NetworkClient(baseURL: URL(string: baseURL.rawValue)!)
+    client = NetworkClient(baseURL: baseURL)
       .bodyDecoder(.json(dateDecodingStrategy: .iso8601, keyDecodingStrategy: .convertFromSnakeCase))
       .auth(.bearer(token: token))
   }
@@ -65,7 +62,7 @@ struct Petstore {
 
     /// POST /store/order
     func order(_ model: OrderModel) async throws -> OrderModel {
-      try await client.post("order").body(model).call()
+      try await client("order").body(model).post()
     }
   }
 }
