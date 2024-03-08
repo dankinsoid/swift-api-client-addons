@@ -6,10 +6,6 @@ import FoundationNetworking
 
 extension NetworkClient {
 
-	func request() throws -> URLRequest {
-		try withRequest { request, _ in request }
-	}
-
 	func configs() -> Configs {
 		withConfigs { $0 }
 	}

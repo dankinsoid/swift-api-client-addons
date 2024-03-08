@@ -10,7 +10,7 @@ protocol TokenCacheService {
 
 extension NetworkClient {
 
-	func beaerAuth(_ service: TokenCacheService) -> NetworkClient {
+	func bearerAuth(_ service: TokenCacheService) -> NetworkClient {
 		// It's not required to create a .tokenCacheService config in this case, but it allows to override the token cache service and use it in other services, for instance, in a token refresher.
 		configs(\.tokenCacheService, service)
 			.auth(

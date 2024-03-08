@@ -49,7 +49,7 @@ public extension NetworkClient {
 					}
 					throw error
 				}
-				if !response.isStatusCodeValid, needRetry() {
+				if !response.httpStatusCode.isSuccess, needRetry() {
 					return try await retry()
 				}
 				return (data, response)

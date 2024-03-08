@@ -104,7 +104,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.7.0")
+    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.8.0")
   ],
   targets: [
     .target(

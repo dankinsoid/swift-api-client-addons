@@ -17,8 +17,8 @@ public struct Petstore {
 	public init(baseURL: BaseURL, fileID: String, line: UInt) {
 		client = NetworkClient(baseURL: URL(string: baseURL.rawValue)!)
 			.fileIDLine(fileID: fileID, line: line)
-			.bodyDecoder(.json(dateDecodingStrategy: .iso8601, keyDecodingStrategy: .convertFromSnakeCase))
-			.beaerAuth(
+			.bodyDecoder(PetstoreDecoder())
+			.bearerAuth(
 				valueFor(
 					live: UserDefaultsTokenCacheService(),
 					test: MockTokenCacheService()

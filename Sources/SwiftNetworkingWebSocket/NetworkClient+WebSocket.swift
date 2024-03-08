@@ -64,9 +64,37 @@ public extension WebSocketClient {
 public extension NetworkClientCaller where Result == WebSocketChannel<Value>, Response == Data {
 
 	static var webSocket: NetworkClientCaller {
-		NetworkClientCaller { request, configs, serialize in
-			try configs.webSocketClient.connect(request, configs).map {
-				try serialize($0) {}
+		NetworkClientCaller { uuid, request, configs, serialize in
+			do {
+				return try configs.webSocketClient.connect(request, configs).map { data in
+					do {
+						let result = try serialize(data) {}
+						if !configs.loggingComponents.isEmpty {
+							let message = configs.loggingComponents.responseMessage(
+								uuid: uuid,
+								data: data
+							)
+							configs.logger.error("\(message)")
+						}
+						return result
+					} catch {
+						if !configs.loggingComponents.isEmpty {
+							let message = configs.loggingComponents.responseMessage(
+								uuid: uuid,
+								data: data,
+								error: error
+							)
+							configs.logger.error("\(message)")
+						}
+						throw error
+					}
+				}
+			} catch {
+				if !configs.loggingComponents.isEmpty {
+					let message = configs.loggingComponents.errorMessage(uuid: uuid, error: error)
+					configs.logger.error("\(message)")
+				}
+				throw error
 			}
 		} mockResult: { value in
 			WebSocketChannel([value].async) { _ in
