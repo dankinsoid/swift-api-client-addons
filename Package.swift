@@ -4,7 +4,7 @@
 import PackageDescription
 
 var package = Package(
-	name: "swift-networking",
+	name: "swift-networking-addons",
 	platforms: [
 		.macOS(.v10_15),
 		.iOS(.v13),
@@ -12,25 +12,25 @@ var package = Package(
 		.tvOS(.v13),
 	],
 	products: [
-		.library(name: "SwiftNetworking", targets: ["SwiftNetworking"]),
+		.library(name: "SwiftNetworkingAddons", targets: ["SwiftNetworkingAddons"]),
 	],
 	dependencies: [
-		.package(url: "https://github.com/dankinsoid/swift-networking-core.git", from: "0.22.2"),
+		.package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.23.0"),
 		.package(url: "https://github.com/dankinsoid/swift-json.git", from: "0.1.0"),
 		.package(url: "https://github.com/dankinsoid/MultipartFormDataKit.git", from: "1.0.2"),
 	],
 	targets: [
 		.target(
-			name: "SwiftNetworking",
+			name: "SwiftNetworkingAddons",
 			dependencies: [
-				.product(name: "SwiftNetworkingCore", package: "swift-networking-core"),
+				.product(name: "SwiftNetworking", package: "swift-networking"),
 				.product(name: "SwiftJSON", package: "swift-json"),
 				.product(name: "MultipartFormDataKit", package: "MultipartFormDataKit"),
 			]
 		),
 		.testTarget(
-			name: "SwiftNetworkingTests",
-			dependencies: [.target(name: "SwiftNetworking")]
+			name: "SwiftNetworkingAddonsTests",
+			dependencies: [.target(name: "SwiftNetworkingAddons")]
 		),
 	]
 )
@@ -50,7 +50,7 @@ package.targets.append(
 	.target(
 		name: "SwiftNetworkingWebSocket",
 		dependencies: [
-			.target(name: "SwiftNetworking"),
+			.target(name: "SwiftNetworkingAddons"),
 			.product(name: "Starscream", package: "Starscream"),
 		]
 	)

@@ -1,5 +1,5 @@
-# swift-networking
-This library extends [swift-networking-core](https://github.com/dankinsoid/swift-networking-core) to make it a more universal tool.
+# swift-networking-addons
+This library extends [swift-networking](https://github.com/dankinsoid/swift-networking) to make it a more universal tool.
 
 ## WebSocket
 The library offers a straightforward approach to handling WebSockets, utilizing the [Starscream](https://github.com/daltoniam/Starscream.git) library.
@@ -39,13 +39,13 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.9.0")
+    .package(url: "https://github.com/dankinsoid/swift-networking-addons.git", from: "0.10.0")
   ],
   targets: [
     .target(
       name: "SomeProject",
       dependencies: [
-        .product(name:  "SwiftNetworking", package: "swift-networking"),
+        .product(name:  "SwiftNetworkingAddons", package: "swift-networking-addons"),
       ]
     )
   ]
