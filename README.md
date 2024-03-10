@@ -19,11 +19,6 @@ Integrates the [swift-json](https://github.com/dankinsoid/swift-json) library fo
 ```swift
 let json = try client.body(bodyJSON).call(.http, as: .json)
 ```
-## Multipart Form Data
-Simplifies multipart form data handling, based on the on [MultipartFormDataKit](https://github.com/dankinsoid/MultipartFormDataKit.git) library.
-```swift
-client.body(someEncodable, as: .multipartFormData)
-```
 ## `.retryWhenEnterForeground()`  Modifier
 Enables retrying a request when the app re-enters the foreground after being interrupted by transitioning to the background.
 
@@ -39,7 +34,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/swift-networking-addons.git", from: "0.10.0")
+    .package(url: "https://github.com/dankinsoid/swift-networking-addons.git", from: "0.11.0")
   ],
   targets: [
     .target(

@@ -15,17 +15,15 @@ var package = Package(
 		.library(name: "SwiftNetworkingAddons", targets: ["SwiftNetworkingAddons"]),
 	],
 	dependencies: [
-		.package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.23.0"),
-		.package(url: "https://github.com/dankinsoid/swift-json.git", from: "0.1.0"),
-		.package(url: "https://github.com/dankinsoid/MultipartFormDataKit.git", from: "1.0.2"),
+		.package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.26.0"),
+		.package(url: "https://github.com/dankinsoid/swift-json.git", from: "0.1.0")
 	],
 	targets: [
 		.target(
 			name: "SwiftNetworkingAddons",
 			dependencies: [
 				.product(name: "SwiftNetworking", package: "swift-networking"),
-				.product(name: "SwiftJSON", package: "swift-json"),
-				.product(name: "MultipartFormDataKit", package: "MultipartFormDataKit"),
+				.product(name: "SwiftJSON", package: "swift-json")
 			]
 		),
 		.testTarget(
