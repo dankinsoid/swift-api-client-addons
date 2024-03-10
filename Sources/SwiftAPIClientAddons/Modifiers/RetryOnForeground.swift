@@ -1,18 +1,18 @@
 #if canImport(UIKit)
 import Foundation
 
-public extension NetworkClient {
+public extension APIClient {
 
 	/// Configures the network client to retry requests that failed due to the app being in the background.
 	/// - Parameters:
 	///   - retryLimit: An optional integer specifying the maximum number of retries for a request.
 	///                 If `nil`, it will retry indefinitely until successful.
 	///   - wasInBackgroundService: A closure providing a `WasInBackgroundService` instance.
-	/// - Returns: An instance of `NetworkClient` configured with retry behavior upon entering the foreground.
+	/// - Returns: An instance of `APIClient` configured with retry behavior upon entering the foreground.
 	func retryWhenEnterForeground(
 		retryLimit: Int? = nil,
 		wasInBackgroundService: @autoclosure @escaping () -> WasInBackgroundService
-	) -> NetworkClient {
+	) -> APIClient {
 		configs {
 			let base = $0.httpClient
 			$0.httpClient = HTTPClient { request, configs in

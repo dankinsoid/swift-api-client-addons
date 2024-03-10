@@ -4,7 +4,7 @@
 import PackageDescription
 
 var package = Package(
-	name: "swift-networking-addons",
+	name: "swift-api-client-addons",
 	platforms: [
 		.macOS(.v10_15),
 		.iOS(.v13),
@@ -12,23 +12,23 @@ var package = Package(
 		.tvOS(.v13),
 	],
 	products: [
-		.library(name: "SwiftNetworkingAddons", targets: ["SwiftNetworkingAddons"]),
+		.library(name: "SwiftAPIClientAddons", targets: ["SwiftAPIClientAddons"]),
 	],
 	dependencies: [
-		.package(url: "https://github.com/dankinsoid/swift-networking.git", from: "0.26.0"),
-		.package(url: "https://github.com/dankinsoid/swift-json.git", from: "0.1.0")
+		.package(url: "https://github.com/dankinsoid/swift-api-client.git", from: "0.40.0"),
+		.package(url: "https://github.com/dankinsoid/swift-json.git", from: "0.1.0"),
 	],
 	targets: [
 		.target(
-			name: "SwiftNetworkingAddons",
+			name: "SwiftAPIClientAddons",
 			dependencies: [
-				.product(name: "SwiftNetworking", package: "swift-networking"),
-				.product(name: "SwiftJSON", package: "swift-json")
+				.product(name: "SwiftAPIClient", package: "swift-api-client"),
+				.product(name: "SwiftJSON", package: "swift-json"),
 			]
 		),
 		.testTarget(
-			name: "SwiftNetworkingAddonsTests",
-			dependencies: [.target(name: "SwiftNetworkingAddons")]
+			name: "SwiftAPIClientAddonsTests",
+			dependencies: [.target(name: "SwiftAPIClientAddons")]
 		),
 	]
 )
@@ -46,17 +46,17 @@ package.targets[0].dependencies.append(
 )
 package.targets.append(
 	.target(
-		name: "SwiftNetworkingWebSocket",
+		name: "SwiftAPIClientWebSocket",
 		dependencies: [
-			.target(name: "SwiftNetworkingAddons"),
+			.target(name: "SwiftAPIClientAddons"),
 			.product(name: "Starscream", package: "Starscream"),
 		]
 	)
 )
 package.targets.append(
 	.testTarget(
-		name: "SwiftNetworkingWebSocketTests",
-		dependencies: [.target(name: "SwiftNetworkingWebSocket")]
+		name: "SwiftAPIClientWebSocketTests",
+		dependencies: [.target(name: "SwiftAPIClientWebSocket")]
 	)
 )
 #endif

@@ -4,17 +4,17 @@ import Reachability
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
-@testable import SwiftNetworkingAddons
+@testable import SwiftAPIClientAddons
 import XCTest
 
-final class NetworkClientReachabilityTests: XCTestCase {
+final class APIClientReachabilityTests: XCTestCase {
 
 	func testWaitForConnection() async throws {
 		// Create a mock reachability service
 		let reachabilityService = TestReachibilityService()
 
 		// Create a network client
-		let client = NetworkClient(baseURL: URL(string: "https://example.com")!)
+		let client = APIClient(baseURL: URL(string: "https://example.com")!)
 			.httpClient(.test())
 			.waitForConnection(reachabilityService: reachabilityService)
 

@@ -1,31 +1,31 @@
 import Foundation
 import Starscream
-@_exported import SwiftNetworking
+@_exported import SwiftAPIClient
 
 /// A struct representing a WebSocket client for establishing WebSocket connections.
 public struct WebSocketClient {
 
 	/// A closure that establishes a WebSocket connection and returns a `WebSocketChannel` for data communication.
-	public var connect: (URLRequest, NetworkClient.Configs) throws -> WebSocketChannel<Data>
+	public var connect: (URLRequest, APIClient.Configs) throws -> WebSocketChannel<Data>
 
 	/// Initializes a new `WebSocketClient` with a custom connection closure.
-	/// - Parameter connect: A closure that takes a `URLRequest` and `NetworkClient.Configs`, then returns a `WebSocketChannel` for the WebSocket connection.
-	public init(_ connect: @escaping (URLRequest, NetworkClient.Configs) throws -> WebSocketChannel<Data>) {
+	/// - Parameter connect: A closure that takes a `URLRequest` and `APIClient.Configs`, then returns a `WebSocketChannel` for the WebSocket connection.
+	public init(_ connect: @escaping (URLRequest, APIClient.Configs) throws -> WebSocketChannel<Data>) {
 		self.connect = connect
 	}
 }
 
-public extension NetworkClient {
+public extension APIClient {
 
 	/// Sets a custom WebSocket client for the network client.
 	/// - Parameter client: The `WebSocketClient` to be used for WebSocket connections.
-	/// - Returns: An instance of `NetworkClient` configured with the specified WebSocket client.
-	func webSocketClient(_ client: WebSocketClient) -> NetworkClient {
+	/// - Returns: An instance of `APIClient` configured with the specified WebSocket client.
+	func webSocketClient(_ client: WebSocketClient) -> APIClient {
 		configs(\.webSocketClient, client)
 	}
 }
 
-public extension NetworkClient.Configs {
+public extension APIClient.Configs {
 
 	/// The WebSocket client used for WebSocket connections.
 	/// Gets the currently set `WebSocketClient`, or the default client if not set.
@@ -61,10 +61,10 @@ public extension WebSocketClient {
 	}
 }
 
-public extension NetworkClientCaller where Result == WebSocketChannel<Value>, Response == Data {
+public extension APIClientCaller where Result == WebSocketChannel<Value>, Response == Data {
 
-	static var webSocket: NetworkClientCaller {
-		NetworkClientCaller { uuid, request, configs, serialize in
+	static var webSocket: APIClientCaller {
+		APIClientCaller { uuid, request, configs, serialize in
 			do {
 				return try configs.webSocketClient.connect(request, configs).map { data in
 					do {

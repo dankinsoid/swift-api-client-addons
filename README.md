@@ -1,5 +1,5 @@
-# swift-networking-addons
-This library extends [swift-networking](https://github.com/dankinsoid/swift-networking) to make it a more universal tool.
+# swift-api-client-addons
+This library extends [swift-api-client](https://github.com/dankinsoid/swift-api-client) to make it a more universal tool.
 
 ## WebSocket
 The library offers a straightforward approach to handling WebSockets, utilizing the [Starscream](https://github.com/daltoniam/Starscream.git) library.
@@ -34,13 +34,13 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/swift-networking-addons.git", from: "0.11.0")
+    .package(url: "https://github.com/dankinsoid/swift-api-client-addons.git", from: "0.12.0")
   ],
   targets: [
     .target(
       name: "SomeProject",
       dependencies: [
-        .product(name:  "SwiftNetworkingAddons", package: "swift-networking-addons"),
+        .product(name:  "SwiftAPIClientAddons", package: "swift-api-client-addons"),
       ]
     )
   ]
@@ -56,7 +56,7 @@ dankinsoid, voidilov@gmail.com
 
 ## License
 
-swift-networking is available under the MIT license. See the LICENSE file for more info.
+swift-api-client-addons is available under the MIT license. See the LICENSE file for more info.
 
 ## Contributing
-We welcome contributions to Swift-Networking! Please read our contributing guidelines to get started.
+We welcome contributions to swift-api-client-addons! Please read our contributing guidelines to get started.

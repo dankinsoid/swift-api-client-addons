@@ -1,5 +1,5 @@
 import Foundation
-import SwiftNetworking
+import SwiftAPIClient
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
@@ -13,9 +13,9 @@ extension HTTPClient {
 	}
 }
 
-private extension NetworkClient.Configs {
+private extension APIClient.Configs {
 
-	var testHTTPClient: (URLRequest, NetworkClient.Configs) throws -> (Data, HTTPURLResponse) {
+	var testHTTPClient: (URLRequest, APIClient.Configs) throws -> (Data, HTTPURLResponse) {
 		get { self[\.testHTTPClient] ?? { _, _ in throw Unimplemented() } }
 		set { self[\.testHTTPClient] = newValue }
 	}
@@ -23,10 +23,10 @@ private extension NetworkClient.Configs {
 
 private struct Unimplemented: Error {}
 
-extension NetworkClient {
+extension APIClient {
 
 	func httpTest(
-		test: @escaping (URLRequest, NetworkClient.Configs) throws -> Void = { _, _ in }
+		test: @escaping (URLRequest, APIClient.Configs) throws -> Void = { _, _ in }
 	) async throws {
 		try await httpTest {
 			try test($0, $1)
@@ -35,7 +35,7 @@ extension NetworkClient {
 	}
 
 	func httpTest(
-		test: @escaping (URLRequest, NetworkClient.Configs) throws -> Data
+		test: @escaping (URLRequest, APIClient.Configs) throws -> Data
 	) async throws {
 		try await configs(\.testHTTPClient) {
 			let data = try test($0, $1)

@@ -1,10 +1,10 @@
 import Foundation
-import SwiftNetworking
+import SwiftAPIClient
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
 
-extension NetworkClient {
+extension APIClient {
 
 	func configs() -> Configs {
 		withConfigs { $0 }

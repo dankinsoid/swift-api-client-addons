@@ -5,7 +5,7 @@ import Reachability
 import FoundationNetworking
 #endif
 
-public extension NetworkClient {
+public extension APIClient {
 
 	/// Configures the network client to wait for a network connection before sending requests,
 	/// with an optional retry mechanism for failed requests.
@@ -14,11 +14,11 @@ public extension NetworkClient {
 	///                 If `nil`, it will keep retrying as long as the network is unreachable.
 	///   - reachabilityService: A `ReachabilityService` instance to monitor network reachability.
 	///                          Defaults to `.default`.
-	/// - Returns: An instance of `NetworkClient` configured to handle network connectivity and retry logic.
+	/// - Returns: An instance of `APIClient` configured to handle network connectivity and retry logic.
 	func waitForConnection(
 		retryLimit: Int? = nil,
 		reachabilityService: ReachabilityService = .default
-	) -> NetworkClient {
+	) -> APIClient {
 		configs { configs in
 			let client = configs.httpClient
 			configs.httpClient = HTTPClient { request, configs in

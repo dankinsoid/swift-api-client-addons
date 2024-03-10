@@ -1,8 +1,8 @@
 import Foundation
-@testable import SwiftNetworking
+@testable import SwiftAPIClient
 import XCTest
 #if canImport(FoundationNetworking)
 import FoundationNetworking
 #endif
 
-final class NetworkClientTests: XCTestCase {}
+final class APIClientTests: XCTestCase {}
