@@ -15,7 +15,7 @@ var package = Package(
 		.library(name: "SwiftAPIClientAddons", targets: ["SwiftAPIClientAddons"]),
 	],
 	dependencies: [
-		.package(url: "https://github.com/dankinsoid/swift-api-client.git", from: "0.40.0"),
+		.package(url: "https://github.com/dankinsoid/swift-api-client.git", from: "1.5.2"),
 		.package(url: "https://github.com/dankinsoid/swift-json.git", from: "0.1.0"),
 	],
 	targets: [
@@ -37,12 +37,6 @@ var package = Package(
 #else
 package.dependencies.append(
 	.package(url: "https://github.com/daltoniam/Starscream.git", from: "4.0.6")
-)
-package.dependencies.append(
-	.package(url: "https://github.com/ashleymills/Reachability.swift", from: "5.1.0")
-)
-package.targets[0].dependencies.append(
-	.product(name: "Reachability", package: "Reachability.swift")
 )
 package.targets.append(
 	.target(

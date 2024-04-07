@@ -13,13 +13,3 @@ public extension APIClient {
 		body(json, as: .json)
 	}
 }
-
-public extension APIClient {
-
-	/// Sets the request body stream with a JSON object.
-	/// - Parameter json: The JSON object to set as the body stream.
-	/// - Returns: An instance of `APIClient` with the serialized body stream.
-	func bodyStream(_ json: JSON) -> APIClient {
-		bodyStream(json, as: .json)
-	}
-}
