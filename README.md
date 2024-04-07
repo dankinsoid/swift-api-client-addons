@@ -9,18 +9,11 @@ for try await item in channel {
     ...
 }
 ```
-## Reachability Monitoring
-Facilitates network reachability monitoring, leveraging the [Reachability](https://github.com/ashleymills/Reachability.swift) library.
-```swift
-let newClient = client.waitForConnection()
-```
 ## JSON API
 Integrates the [swift-json](https://github.com/dankinsoid/swift-json) library for easy JSON API interactions.
 ```swift
 let json = try client.body(bodyJSON).call(.http, as: .json)
 ```
-## `.retryWhenEnterForeground()`  Modifier
-Enables retrying a request when the app re-enters the foreground after being interrupted by transitioning to the background.
 
 ## Installation
 
@@ -34,7 +27,7 @@ import PackageDescription
 let package = Package(
   name: "SomeProject",
   dependencies: [
-    .package(url: "https://github.com/dankinsoid/swift-api-client-addons.git", from: "0.13.0")
+    .package(url: "https://github.com/dankinsoid/swift-api-client-addons.git", from: "0.14.0")
   ],
   targets: [
     .target(
