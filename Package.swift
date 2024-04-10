@@ -15,7 +15,7 @@ var package = Package(
 		.library(name: "SwiftAPIClientAddons", targets: ["SwiftAPIClientAddons"]),
 	],
 	dependencies: [
-		.package(url: "https://github.com/dankinsoid/swift-api-client.git", from: "1.5.2"),
+		.package(url: "https://github.com/dankinsoid/swift-api-client.git", from: "1.6.1"),
 		.package(url: "https://github.com/dankinsoid/swift-json.git", from: "0.1.0"),
 	],
 	targets: [

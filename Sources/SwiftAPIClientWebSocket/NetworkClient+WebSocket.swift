@@ -65,20 +65,12 @@ public extension WebSocketClient {
 public extension APIClientCaller where Result == WebSocketChannel<Value>, Response == Data {
 
 	static var webSocket: APIClientCaller {
-		APIClientCaller { uuid, request, body, configs, serialize in
+		APIClientCaller { uuid, request, configs, serialize in
 			do {
-                guard var urlRequest = URLRequest(httpRequest: request) else {
+                guard var urlRequest = request.urlRequest else {
                     throw Errors.invalidRequest
                 }
                 urlRequest.timeoutInterval = configs.timeoutInterval
-                switch body {
-                case let .data(data):
-                    urlRequest.httpBody = data
-                case let .file(url):
-                    urlRequest.httpBodyStream = InputStream(url: url)
-                case nil:
-                    break
-                }
 				return try configs.webSocketClient.connect(urlRequest, configs).map { data in
 					do {
 						let result = try serialize(data) {}
